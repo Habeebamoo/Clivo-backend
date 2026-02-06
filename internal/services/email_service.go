@@ -20,7 +20,7 @@ func NewEmailService() EmailService {
 }
 
 func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) {
-	email, _ := config.Get("EMAIL_SENDER")
+	email, _ := config.Get("ADMIN_EMAIL")
 	pass, _ := config.Get("EMAIL_PASS")
 	clientUrl, _ := config.Get("CLIENT_URL")
 
@@ -101,7 +101,7 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 
 //welcome email to admin
 func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, interests string) {
-	email, _ := config.Get("EMAIL_SENDER")
+	email, _ := config.Get("ADMIN_EMAIL")
 	pass, _ := config.Get("EMAIL_PASS")
 	clientUrl, _ := config.Get("CLIENT_URL")
 

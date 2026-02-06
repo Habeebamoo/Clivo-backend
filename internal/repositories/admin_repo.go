@@ -9,6 +9,7 @@ import (
 
 type AdminRepository interface {
 	GetUsers() ([]models.UserResponse, int, error)
+	GetAppeals() ([]models.Appeal, int, error)
 	GetUser(string) (models.UserResponse, int, error)
 	UpdateUserVerification(string, bool) (int, error)
 	UpdateUserRestriction(string, bool) (int, error)
@@ -40,6 +41,21 @@ func (ar *AdminRepo) GetUsers() ([]models.UserResponse, int, error) {
 	}
 
 	return users, 200, nil
+}
+
+func (ar *AdminRepo) GetAppeals() ([]models.Appeal, int, error) {
+	var appeals []models.Appeal
+	res := ar.db.Find(&appeals)
+
+	if res.Error != nil {
+		if res.Error == gorm.ErrRecordNotFound {
+			return appeals, 200, nil
+		}
+
+		return appeals, 500, fmt.Errorf("internal server error")
+	}
+
+	return  appeals, 200, nil
 }
 
 func (ar *AdminRepo) GetUser(userId string) (models.UserResponse, int, error) {

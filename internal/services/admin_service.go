@@ -7,6 +7,7 @@ import (
 
 type AdminService interface {
 	GetUsers() ([]models.UserResponse, int, error)
+	GetAppeals() ([]models.Appeal, int, error)
 	GetUser(string) (models.UserResponse, int, error)
 	VerifyUser(string) (int, error)
 	UnVerifyUser(string) (int, error)
@@ -26,6 +27,10 @@ func NewAdminService(repo repositories.AdminRepository) AdminService {
 
 func (as *AdminSvc) GetUsers() ([]models.UserResponse, int, error) {
 	return as.repo.GetUsers()
+}
+
+func (as *AdminSvc) GetAppeals() ([]models.Appeal, int, error) {
+	return as.repo.GetAppeals()
 }
 
 func (as *AdminSvc) GetUser(userId string) (models.UserResponse, int, error) {

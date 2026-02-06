@@ -41,10 +41,21 @@ CREATE TABLE IF NOT EXISTS follows (
   FOREIGN KEY (follower_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (following_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS appeals (
+  user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  picture TEXT NOT NULL,
+  username TEXT NOT NULL,
+  message TEXT NOT NULL,
+
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
+DROP TABLE appeals;
 DROP TABLE follows;
 DROP TABLE user_interests;
 DROP TABLE profiles;

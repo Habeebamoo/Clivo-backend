@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Habeebamoo/Clivo/server/internal/config"
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/repositories"
 	"github.com/Habeebamoo/Clivo/server/pkg/utils"
@@ -14,6 +15,7 @@ import (
 type AuthService interface {
 	SignUpUser(models.UserRequest) (string, int, error)
 	SignInUser(models.UserRequest) (string, int, error)
+	SignInAdmin(string) (string, error)
 	UserExists(string) (bool)
 }
 
@@ -129,4 +131,19 @@ func (as *AuthSvc) UserExists(email string) bool {
 	} else {
 		return false
 	}
+}
+
+func (as *AuthSvc) SignInAdmin(email string) (string, error) {
+	adminEmail, _ := config.Get("ADMIN_EMAIL")
+
+	if email != adminEmail {
+		return "", fmt.Errorf("Unauthorized Access")
+	}
+
+	token, err := utils.SignToken(models.TokenPayload{ UserId: "admin", Role: "admin" })
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

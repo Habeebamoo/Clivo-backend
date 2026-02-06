@@ -31,6 +31,13 @@ func (ahdl *AuthHandler) GoogleLogin(c *gin.Context) {
 	c.Redirect(http.StatusFound, url)
 }
 
+func (ahdl *AuthHandler) AdminGoogleLogin(c *gin.Context) {
+	//redirect to google oauth
+	state := "adminstatedemo"
+	url := config.OauthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	c.Redirect(http.StatusFound, url)
+}
+
 func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 	//google oauth logic here
 	ctx := context.Background()
@@ -49,14 +56,6 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 
 	//frontend url
 	clientOrigin, _ := config.Get("CLIENT_URL")
-
-	//validate state
-	state := c.Query("state")
-	if state != "statedemo" {
-		redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, "Unauthorized Access")
-		c.Redirect(http.StatusFound, redirectUrl)
-		return
-	}
 
 	//get code
 	code := c.Query("code")
@@ -105,46 +104,75 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 	email := userInfo["email"].(string)
 	picture := userInfo["picture"].(string)
 
-	userReq := models.UserRequest{
-		Name: name,
-		Email: email,
-		Picture: picture,
-		Interets: []string{},
+
+	//use state to determine admin or user
+	state := c.Query("state")
+	if state == "" {
+		redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, "Unauthorized Access")
+		c.Redirect(http.StatusFound, redirectUrl)
+		return
 	}
 
-	//cheks if user exists
-	userExists := ahdl.service.UserExists(email)
+	if state == "statedemo" {
+		//user login
 
-	if userExists {
-		//call service (user signin)
-		token, _, err := ahdl.service.SignInUser(userReq)
-		if err != nil {
-			//redirect to clivo welcome page
-			clientOrigin, _ := config.Get("CLIENT_URL")
-			c.Redirect(http.StatusFound, clientOrigin)
+		userReq := models.UserRequest{
+			Name: name,
+			Email: email,
+			Picture: picture,
+			Interets: []string{},
 		}
 
-		//set cookies
-		utils.SetCookies(c, token)
+		//cheks if user exists
+		userExists := ahdl.service.UserExists(email)
 
-		//redirect to clivo home
-		clientOrigin, _ := config.Get("CLIENT_URL")
-		redirectURL := fmt.Sprintf("%s/home", clientOrigin)
-		c.Redirect(http.StatusFound, redirectURL)
+		if userExists {
+			//call service (user signin)
+			token, _, err := ahdl.service.SignInUser(userReq)
+			if err != nil {
+				//redirect to clivo welcome page
+				clientOrigin, _ := config.Get("CLIENT_URL")
+				c.Redirect(http.StatusFound, clientOrigin)
+			}
+
+			//set cookies
+			utils.SetCookies(c, token)
+
+			//redirect to clivo home
+			clientOrigin, _ := config.Get("CLIENT_URL")
+			redirectURL := fmt.Sprintf("%s/home", clientOrigin)
+			c.Redirect(http.StatusFound, redirectURL)
+
+		} else {
+			//encode user info
+			encodedUserInfo, err := utils.EncodeUser(models.UserPayload{Name: userReq.Name, Email: userReq.Email, Picture: userReq.Picture})
+			if err != nil {
+				redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, "Internal server error")
+				c.Redirect(http.StatusFound, redirectUrl)
+				return
+			}
+
+			//redirect to clivo interest page
+			clientOrigin, _ := config.Get("CLIENT_URL")
+			redirectURL := fmt.Sprintf("%s/interests?token=%s", clientOrigin, encodedUserInfo)
+			c.Redirect(http.StatusFound, redirectURL)
+		}
 
 	} else {
-		//encode user info
-		encodedUserInfo, err := utils.EncodeUser(models.UserPayload{Name: userReq.Name, Email: userReq.Email, Picture: userReq.Picture})
+		//admin login
+
+		jwtToken, err := ahdl.service.SignInAdmin(email)
 		if err != nil {
-			redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, "Internal server error")
+			redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, utils.FormatText(err.Error()))
 			c.Redirect(http.StatusFound, redirectUrl)
 			return
 		}
 
-		//redirect to clivo interest page
-		clientOrigin, _ := config.Get("CLIENT_URL")
-		redirectURL := fmt.Sprintf("%s/interests?token=%s", clientOrigin, encodedUserInfo)
-		c.Redirect(http.StatusFound, redirectURL)
+		// send cookie
+		utils.SetCookies(c, jwtToken)
+
+		redirectUrl := fmt.Sprintf("%s/admin/dashboard", clientOrigin)
+		c.Redirect(http.StatusFound, redirectUrl)
 	}
 }
 

@@ -80,7 +80,7 @@ func SignToken(payload models.TokenPayload) (string, error) {
 	claims := jwt.MapClaims{
 		"userId": payload.UserId,
 		"role": payload.Role,
-		"exp": time.Now().Add(1*time.Hour).Unix(),
+		"exp": time.Now().Add(24*time.Hour).Unix(),
 	}
 
 	tokenString := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

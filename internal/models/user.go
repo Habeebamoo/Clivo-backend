@@ -37,6 +37,14 @@ type Follow struct {
 	FollowingId  string  `json:"followingId"`
 }
 
+type Appeal struct {
+	UserId    string  `json:"userId"`
+	Name      string  `json:"name"`
+	Picture   string  `json:"picture"`
+	Username  string  `json:"username"`
+	Message   string  `json:"message"`
+}
+
 type UserRequest struct {
 	Name       string     `json:"name"`
 	Email      string     `json:"email"`

@@ -34,6 +34,7 @@ func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.Artic
 	{
 		auth.GET("/google", authHandler.GoogleLogin)
 		auth.GET("/google/callback", authHandler.GoogleCallBack)
+		auth.GET("/admin/google", authHandler.AdminGoogleLogin)
 		auth.POST("/signin", middlewares.RequireAPIKey(), authHandler.SignIn)
 		auth.POST("/logout", middlewares.RequireAPIKey(), middlewares.AuthenticateUser(), authHandler.Logout)
 	}
@@ -67,7 +68,7 @@ func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.Artic
 	//admin routes
 	admin := api.Group("/admin", middlewares.RequireAPIKey(), middlewares.VerifyAdmin())
 	{
-		admin.GET("/users", adminHandler.GetUsers)
+		admin.GET("/stats", adminHandler.GetAdminStats)
 		admin.GET("/users/:id", adminHandler.GetUser)
 		admin.POST("/verify/:id", adminHandler.VerifyUser)
 		admin.POST("/unverify/:id", adminHandler.UnVerifyUser)

@@ -14,15 +14,23 @@ func NewAdminHandler(service services.AdminService) AdminHandler {
 	return AdminHandler{service}
 }
 
-func (ahdl *AdminHandler) GetUsers(c *gin.Context) {
-	//call service
-	users, statusCode, err := ahdl.service.GetUsers()
+func (ahdl *AdminHandler) GetAdminStats(c *gin.Context) {
+	//get users
+	users, code, err := ahdl.service.GetUsers()
 	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
+		utils.Error(c, code, utils.FormatText(err.Error()), nil)
 		return
 	}
 
-	utils.Success(c, statusCode, "", users)
+	//get appeals
+	appeals, code, err := ahdl.service.GetAppeals()
+	if err != nil {
+		utils.Error(c, code, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	data := map[string]any{ "users": users, "appeals": appeals }
+	utils.Success(c, 200, "", data)
 }
 
 func (ahdl *AdminHandler) GetUser(c *gin.Context) {
