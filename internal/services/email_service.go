@@ -83,29 +83,6 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 		</html>
 	`, userName, fmt.Sprintf("%s/home/create", clientUrl), userEmail)
 
-	// templContent, err := templatesFS.ReadFile(fmt.Sprintf("templates/%s", "welcome.html"))
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// templ, err := template.New("welcome.html").Parse(string(templContent))
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// data := struct{
-	// 	Name string
-	// 	Email string
-	// 	Page string
-	// } { 
-	// 	Name: userName, 
-	// 	Email: userEmail, 
-	// 	Page: fmt.Sprintf("%s/%s", clientUrl, userUsername),
-	// }
-
-	// var body bytes.Buffer
-	// templ.Execute(&body, data)
-
 	m := gomail.NewMessage()
 	m.SetHeader("From", m.FormatAddress(email, "Clivo"))
 	m.SetHeader("To", userEmail)
@@ -182,33 +159,6 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 			</body>
 		</html>
 	`, userName, userEmail, userUsername, fmt.Sprintf("%s/%s", clientUrl, userUsername))
-
-	// templContent, err := templatesFS.ReadFile(fmt.Sprintf("templates/%s", "adminWelcome.html"))
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// templ, err := template.New("adminWelcome.html").Parse(string(templContent))
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// data := struct {
-	// 	Name string
-	// 	Email string
-	// 	Username string
-	// 	Interests string
-	// 	Profile string
-	// } { 
-	// 	Name: userName, 
-	// 	Email: userEmail, 
-	// 	Username: userUsername,
-	// 	Interests: interests,
-	// 	Profile: fmt.Sprintf("%s/%s", clientUrl, userUsername),
-	// }
-
-	// var body bytes.Buffer
-	// templ.Execute(&body, data)
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", m.FormatAddress(email, "Clivo"))
