@@ -11,6 +11,8 @@ import (
 type EmailService interface {
 	SendWelcomeEmail(string, string, string)
 	SendWelcomeEmailToAdmin(string, string, string, string)
+	SendVerifiedUserEmail(string, string)
+	SendUnverifiedUserEmail(string, string)
 }
 
 type EmailSvc struct {}
@@ -35,7 +37,7 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
 					<!-- logo -->
 					<tr>
-						<td style="padding: 20px; display: flex; align-items: center; gap: 10px;">
+						<td style="padding: 20px;">
 							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
 							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
 						</td>
@@ -43,7 +45,7 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 
 					<tr>
 						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Hi %s</p>
+							<p>Hi %s,</p>
 							<p>Welcome to Clivo. we're excited to have you join our growing community of thinkers, writers, and readers.</p>
 
 							<div style="line-height: 1.5;">
@@ -116,7 +118,7 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
 					<!-- logo -->
 					<tr>
-						<td style="padding: 20px; display: flex; align-items: center; gap: 10px;">
+						<td style="padding: 20px;">
 							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
 							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
 						</td>
@@ -176,3 +178,170 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 	log.Println("...Welcome Email To Admin Sent...")
 }
 
+func (ems *EmailSvc) SendVerifiedUserEmail(userName, userEmail string) {
+	email, _ := config.Get("ADMIN_EMAIL")
+	pass, _ := config.Get("EMAIL_PASS")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	if email == "" || pass == "" || clientUrl == "" {
+		panic("failed to get env variables")
+	}
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+					<!-- logo -->
+					<tr>
+						<td style="padding: 20px;">
+							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p>Hi %s,</p>
+							<p>Great news! Your account has been officially verified, and you’ll now see a blue check mark next to your name on your profile and published articles.</p>
+
+							<p>
+                This verification lets readers know that your identity has been confirmed and that your work comes from an authentic, trusted voice on our platform. It also helps your articles stand out and builds credibility with your audience.
+              </p>
+
+              <p>
+                There’s nothing you need to do — your verification is already live. Just keep writing, publishing, and engaging with the community as you always do.
+              </p>
+
+              <p>
+                Thanks for being a valued part of our writer community. We’re excited to see what you publish next.
+              </p>
+
+							<div style="line-height: 0.4; margin-top: 30px;">
+								<p>Warm regards</p>
+								<p>The Clivo Team.</p>
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+
+							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
+							</div>
+
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+								This message was sent to 
+								<span style="text-decoration: underline;">%s</span>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, userName, userEmail)
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
+	m.SetHeader("To", userEmail)
+	m.SetHeader("Subject", "Your account is now verified")
+	m.SetBody("text/html", html)
+
+	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
+	d.SSL = true
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	log.Println("...User Verified Email Sent...")
+}
+
+
+func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
+	email, _ := config.Get("ADMIN_EMAIL")
+	pass, _ := config.Get("EMAIL_PASS")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	if email == "" || pass == "" || clientUrl == "" {
+		panic("failed to get env variables")
+	}
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+					<!-- logo -->
+					<tr>
+						<td style="padding: 20px;">
+							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p>Hi %s,</p>
+
+							<p>
+								We’re writing to let you know that the verification badge (blue check mark) has been removed from your account.
+							</p>
+
+							<p>
+                This change doesn’t affect your ability to write, publish, or engage on the platform. Your profile and articles remain active and visible to readers as usual. Verification statuses may be updated from time to time based on our review processes and current eligibility criteria.
+              </p>
+
+              <p>
+                If you believe this change was made in error or if you’d like to learn more about verification requirements, you can review our guidelines or reach out to our support team for assistance.
+              </p>
+
+              <p>
+                Thank you for being part of our writer community, and we appreciate your continued contributions.
+              </p>
+
+							<div style="line-height: 0.4; margin-top: 30px;">
+								<p>Warm regards</p>
+								<p>The Clivo Team.</p>
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+
+							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
+							</div>
+
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+								This message was sent to 
+								<span style="text-decoration: underline;">%s</span>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, userName, userEmail)
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
+	m.SetHeader("To", userEmail)
+	m.SetHeader("Subject", "Update regarding your verification status")
+	m.SetBody("text/html", html)
+
+	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
+	d.SSL = true
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	log.Println("...User Un-Verified Email Sent...")
+}

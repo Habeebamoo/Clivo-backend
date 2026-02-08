@@ -1,12 +1,15 @@
 package services
 
 import (
+	"log"
+
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/repositories"
+	"github.com/Habeebamoo/Clivo/server/pkg/utils"
 )
 
 type AdminService interface {
-	GetUsers() ([]models.UserResponse, int, error)
+	GetUsers() ([]models.UserProfileResponse, int, error)
 	GetAppeals() ([]models.Appeal, int, error)
 	GetUser(string) (models.UserResponse, int, error)
 	VerifyUser(string) (int, error)
@@ -25,8 +28,37 @@ func NewAdminService(repo repositories.AdminRepository) AdminService {
 	return &AdminSvc{repo}
 }
 
-func (as *AdminSvc) GetUsers() ([]models.UserResponse, int, error) {
-	return as.repo.GetUsers()
+func (as *AdminSvc) GetUsers() ([]models.UserProfileResponse, int, error) {
+	usersRaw, code, err := as.repo.GetUsers()
+	if err != nil {
+		return []models.UserProfileResponse{}, code, err
+	}
+
+	var users []models.UserProfileResponse
+
+	for _, usr := range usersRaw {
+		user := models.UserProfileResponse{
+			UserId: usr.UserId,
+			Name: usr.Name,
+			Email: usr.Email,
+			Role: usr.Role,
+			Verified: usr.Verified,
+			IsBanned: usr.IsBanned,
+			Username: usr.Username,
+			Bio: usr.Bio,
+			Picture: usr.Picture,
+			Interests: []string{},
+			ProfileUrl: usr.ProfileUrl,
+			Website: usr.Website,
+			Following: usr.Following,
+			Followers: usr.Followers,
+			CreatedAt: utils.GetTimeAgo(usr.CreatedAt),
+		}
+
+		users = append(users, user)
+	}
+
+	return users, code, err
 }
 
 func (as *AdminSvc) GetAppeals() ([]models.Appeal, int, error) {
@@ -50,9 +82,24 @@ func (as *AdminSvc) VerifyUser(userId string) (int, error) {
 	}
 
 	//verify if not
-	return as.repo.UpdateUserVerification(userId, true)
+	code, err = as.repo.UpdateUserVerification(userId, true)
+	if err != nil {
+		return code, err
+	}
 
 	//notify user
+	go func() {
+		//panic recovery
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("panic recovered from %v", r)
+			}
+		}()
+
+		NewEmailService().SendVerifiedUserEmail(user.Name, user.Email)
+	}()
+
+	return code, err
 }
 
 func (as *AdminSvc) UnVerifyUser(userId string) (int, error) {
@@ -68,9 +115,24 @@ func (as *AdminSvc) UnVerifyUser(userId string) (int, error) {
 	}
 
 	//un-verify if not
-	return as.repo.UpdateUserVerification(userId, false)
+	code, err = as.repo.UpdateUserVerification(userId, false)
+	if err != nil {
+		return code, err
+	}
 
 	//notify user
+	go func() {
+		//panic recovery
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("panic recovered from %v", r)
+			}
+		}()
+
+		NewEmailService().SendUnverifiedUserEmail(user.Name, user.Email)
+	}()
+
+	return code, err
 }
 
 func (as *AdminSvc) BanUser(userId string) (int, error) {
