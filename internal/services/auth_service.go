@@ -14,7 +14,7 @@ import (
 
 type AuthService interface {
 	SignUpUser(models.UserRequest) (string, int, error)
-	SignInUser(models.UserRequest) (string, int, error)
+	SignInUser(models.UserRequest) (models.User, string, int, error)
 	SignInAdmin(string) (string, error)
 	UserExists(string) (bool)
 }
@@ -107,20 +107,20 @@ func (as *AuthSvc) SignUpUser(userReq models.UserRequest) (string, int, error) {
 	return token, 201, nil
 }
 
-func (as *AuthSvc) SignInUser(userReq models.UserRequest) (string, int, error) {
+func (as *AuthSvc) SignInUser(userReq models.UserRequest) (models.User, string, int, error) {
 	//get user
 	foundUser, code, err := as.repo.GetUserByEmail(userReq.Email)
 	if err != nil {
-		return "", code, err
+		return models.User{}, "", code, err
 	}
 
 	//sign jwt
 	token, err := utils.SignToken(models.TokenPayload{ UserId: foundUser.UserId, Role: foundUser.Role })
 	if err != nil {
-		return "", 401, err
+		return models.User{}, "", 401, err
 	}
 
-	return token, 200, nil
+	return foundUser, token, 200, nil
 }
 
 func (as *AuthSvc) UserExists(email string) bool {

@@ -276,3 +276,37 @@ func (uhdl *UserHandler) GetUsersFollowing(c *gin.Context) {
 	
 	utils.Success(c, statusCode, "", followers)
 }
+
+func (uhdl *UserHandler) GetAppealStatus(c *gin.Context) {
+	userId := c.Param("userId")
+	if userId == "" {
+		utils.Error(c, 400, "Missing UserID", nil)
+		return
+	}
+
+	//call service
+	status, code, err := uhdl.service.GetAppealStatus(userId)
+	if err != nil {
+		utils.Error(c, code, utils.FormatText(err.Error()), nil)
+	}
+
+	data := map[string]bool{"status": status}
+	utils.Success(c, 200, "", data)
+}
+
+func (uhdl *UserHandler) SubmitAppeal(c *gin.Context) {
+	var appealReq models.AppealRequest
+	if err := c.ShouldBindJSON(&appealReq); err != nil {
+		utils.Error(c, 400, "Invalid JSON Format", nil)
+		return
+	}
+
+	//call service
+	code, err := uhdl.service.CreateAppeal(appealReq)
+	if err != nil {
+		utils.Error(c, code, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	utils.Success(c, code, "Appeal Submitted", nil)
+}

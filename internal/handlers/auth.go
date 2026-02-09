@@ -128,11 +128,21 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 
 		if userExists {
 			//call service (user signin)
-			token, _, err := ahdl.service.SignInUser(userReq)
+			user, token, _, err := ahdl.service.SignInUser(userReq)
 			if err != nil {
 				//redirect to clivo welcome page
 				clientOrigin, _ := config.Get("CLIENT_URL")
 				c.Redirect(http.StatusFound, clientOrigin)
+			}
+
+			//verify user ban-status
+			if user.IsBanned {
+				//redirect to clivo home
+
+				clientOrigin, _ := config.Get("CLIENT_URL")
+				redirectURL := fmt.Sprintf("%s/appeal/%s", clientOrigin, user.UserId)
+				c.Redirect(http.StatusFound, redirectURL)
+				return
 			}
 
 			//set cookies
@@ -176,7 +186,7 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 	}
 }
 
-func (ahdl *AuthHandler) SignIn(c *gin.Context) {
+func (ahdl *AuthHandler) SignUp(c *gin.Context) {
 	var interests []string
 	if err := c.ShouldBindJSON(&interests); err != nil {
 		utils.Error(c, 400, "", nil)

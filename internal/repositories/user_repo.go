@@ -29,6 +29,8 @@ type UserRepository interface {
 	GetArticleTags(string) ([]models.ArticleTags, error)
 	GetArticleComments(string) ([]models.Comment, int, error)
 	GetCommentReplys(string) ([]models.Comment, int, error)
+	CreateAppeal(models.Appeal) (int, error)
+	GetUserAppeals(string) ([]models.Appeal, int, error)
 }
 
 type UserRepo struct {
@@ -390,6 +392,31 @@ func (ur *UserRepo) GetCommentReplys(commentId string) ([]models.Comment, int, e
 	}
 
 	return comments, 200, nil
+}
+
+func (ur *UserRepo) CreateAppeal(appealReq models.Appeal) (int, error) {
+	res := ur.db.Create(&appealReq)
+
+	if res.Error != nil {
+		return 500, fmt.Errorf("internal server error")
+	}
+
+	return 201, nil
+}
+
+func (ur *UserRepo) GetUserAppeals(userId string) ([]models.Appeal, int, error) {
+	var appeals []models.Appeal
+
+	res := ur.db.Find(&appeals, "user_id = ?", userId)
+
+	if res.Error != nil {
+		if res.Error == gorm.ErrRecordNotFound {
+			return appeals, 200, nil
+		}
+		return appeals, 500, fmt.Errorf("internal server error")
+	}
+
+	return appeals, 200, nil
 }
 
 

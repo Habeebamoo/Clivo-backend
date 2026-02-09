@@ -61,6 +61,11 @@ type ProfileUpdateRequest struct {
 	FileAvailable bool
 }
 
+type AppealRequest struct {
+	UserId   string  `json:"userId"`
+	Message  string  `json:"message"`
+}
+
 type UserProfileResponse struct {
 	UserId       string     `json:"userId"`
 	Name         string     `json:"name"`

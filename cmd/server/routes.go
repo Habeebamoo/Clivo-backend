@@ -28,6 +28,8 @@ func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.Artic
 	api.GET("/user/:username/:title/comments", userHandler.GetArticleComments)
 	api.GET("/user/follow-status/:userId/:username", userHandler.GetFollowStatus)
 	api.GET("/comments/:id/replys", userHandler.GetCommentReplys)
+	api.GET("/user/appeal-status/:userId", userHandler.GetAppealStatus)
+	api.POST("/appeals", userHandler.SubmitAppeal)
 
 	//authentication routes
 	auth := api.Group("/auth")
@@ -35,7 +37,7 @@ func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.Artic
 		auth.GET("/google", authHandler.GoogleLogin)
 		auth.GET("/google/callback", authHandler.GoogleCallBack)
 		auth.GET("/admin/google", authHandler.AdminGoogleLogin)
-		auth.POST("/signin", middlewares.RequireAPIKey(), authHandler.SignIn)
+		auth.POST("/signup", middlewares.RequireAPIKey(), authHandler.SignUp)
 		auth.POST("/logout", middlewares.RequireAPIKey(), middlewares.AuthenticateUser(), authHandler.Logout)
 	}
 
