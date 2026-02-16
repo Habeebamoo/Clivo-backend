@@ -152,6 +152,13 @@ func (uhdl *UserHandler) SubmitAppeal(c *gin.Context) {
 		return
 	}
 
+	//check if user exists
+  user, _, _ := uhdl.service.GetUserProfile(appealReq.UserId)
+	if user.Email == "" {
+		utils.Error(c, 401, "Unauthorized Access", nil)
+		return
+	}
+
 	//call service
 	code, err := uhdl.service.CreateAppeal(appealReq)
 	if err != nil {
