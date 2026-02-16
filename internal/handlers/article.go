@@ -138,20 +138,6 @@ func (ah *ArticleHandler) GetUserFyp(c *gin.Context) {
 	utils.Success(c, statusCode, "", articles)
 }
 
-// func (ah *ArticleHandler) GetUserFyp(c *gin.Context) {
-// 	userIdAny, _ := c.Get("userId")
-// 	userId := userIdAny.(string)
-
-// 	//call service
-// 	articles, statusCode, err := ah.service.GetUserFyp(userId)
-// 	if err != nil {
-// 		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-// 		return
-// 	}
-
-// 	utils.Success(c, statusCode, "", articles)
-// } 
-
 func (ah *ArticleHandler) DeleteArticle(c *gin.Context) {
 	userIdAny, exists := c.Get("userId")
 	if !exists {
@@ -175,95 +161,4 @@ func (ah *ArticleHandler) DeleteArticle(c *gin.Context) {
 	}
 
 	utils.Success(c, statusCode, "Article has been deleted", nil)
-}
-
-func (ah *ArticleHandler) LikeArticle(c *gin.Context) {
-	var articleLikeRequest models.Like
-	if err := c.ShouldBindJSON(&articleLikeRequest); err != nil {
-		utils.Error(c, 400, "Invalid JSON Format", nil)
-		return
-	}
-
-	//validate request
-	if err := articleLikeRequest.Validate(); err != nil {
-		utils.Error(c, 400, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	//call service
-	statusCode, err := ah.service.LikeArticle(articleLikeRequest)
-	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "", nil)
-}
-
-func (ah *ArticleHandler) HasLikedArticle(c *gin.Context) {
-	articleId := c.Param("articleId")
-	userId := c.Param("userId")
-
-	if articleId == "" || userId == "" {
-		utils.Error(c, 400, "Params Missing", nil)
-		return
-	}
-
-	articleLikeRequest := models.Like{
-		ArticleId: articleId,
-		LikerUserId: userId,
-	}
-
-	//call service
-	liked := ah.service.HasUserLiked(articleLikeRequest)
-
-	response := map[string]bool{ "liked": liked }
-	utils.Success(c, 200, "", response)
-
-}
-
-func (ah *ArticleHandler) CommentArticle(c *gin.Context) {
-	var replyRequest models.CommentRequest
-	if err := c.ShouldBindJSON(&replyRequest); err != nil {
-		utils.Error(c, 400, "Invalid JSON Format", nil)
-		return
-	}
-
-	//validate request
-	if err := replyRequest.Validate(); err != nil {
-		utils.Error(c, 400, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	//call service
-	statusCode, err := ah.service.CommentArticle(replyRequest)
-		if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "Comment Sent.", nil)
-}
-
-func (ah *ArticleHandler) ReplyComment(c *gin.Context) {
-	var replyRequest models.ReplyRequest
-	if err := c.ShouldBindJSON(&replyRequest); err != nil {
-		utils.Error(c, 400, "Invalid JSON Format", nil)
-		return
-	}
-
-	//validate request
-	if err := replyRequest.Validate(); err != nil {
-		utils.Error(c, 400, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	//call service
-	statusCode, err := ah.service.ReplyComment(replyRequest)
-		if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "Reply Sent.", nil)
 }

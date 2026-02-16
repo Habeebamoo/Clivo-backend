@@ -34,80 +34,6 @@ func (uhdl *UserHandler) GetProfile(c *gin.Context) {
 	utils.Success(c, statusCode, "", user)
 }
 
-func (uhdl *UserHandler) GetFollowStatus(c *gin.Context) {
-	userId := c.Param("userId")
-	if userId == "" {
-		utils.Error(c, 400, "UserID Missing", nil)
-		return
-	}
-
-	userFollowing := c.Param("username")
-	if userFollowing == "" {
-		utils.Error(c, 400, "Username Missing", nil)
-		return
-	}
-
-	//call service
-	status, err := uhdl.service.GetFollowStatus(userId, userFollowing)
-	if err != nil {
-		utils.Error(c, 500, "", nil)
-		return
-	}
-
-	data := map[string]bool{ "status": status }
-	utils.Success(c, 200, "", data)
-}
-
-func (uhdl *UserHandler) FollowUser(c *gin.Context) {
-	userIdAny, exists := c.Get("userId")
-	if !exists {
-		utils.Error(c, 401, "Unauthorized Access", nil)
-		return
-	}
-
-	userId := userIdAny.(string)
-
-	userFollowing := c.Param("username")
-	if userFollowing == "" {
-		utils.Error(c, 400, "UserId Missing", nil)
-		return
-	}
-
-	//call service
-	statusCode, err := uhdl.service.FollowUser(userId, userFollowing)
-	if err != nil {
-		utils.Error(c, statusCode, "", nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "", nil)
-}
-
-func (uhdl *UserHandler) UnFollowUser(c *gin.Context) {
-	userIdAny, exists := c.Get("userId")
-	if !exists {
-		utils.Error(c, 401, "Unauthorized Access", nil)
-		return
-	}
-
-	userId := userIdAny.(string)
-
-	userFollowing := c.Param("username")
-	if userFollowing == "" {
-		utils.Error(c, 400, "UserId Missing", nil)
-		return
-	}
-
-	//call service
-	statusCode, err := uhdl.service.UnFollowUser(userId, userFollowing)
-	if err != nil {
-		utils.Error(c, statusCode, "", nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "", nil)
-}
-
 func (uhdl *UserHandler) GetUser(c *gin.Context) {
 	username := c.Param("username")
 	if username == "" {
@@ -161,43 +87,6 @@ func (uhdl *UserHandler) GetUserArticle(c *gin.Context) {
 	utils.Success(c, statusCode, "", article)
 }
 
-func (uhdl *UserHandler) GetArticleComments(c *gin.Context) {
-	username := c.Param("username")
-	articleTitle := c.Param("title")
-
-	if username == "" || articleTitle == "" {
-		utils.Error(c, 400, "Article Not Found", nil)
-		return
-	}
-
-	//call service
-	comments, statusCode, err := uhdl.service.GetArticleComments(username, articleTitle)
-	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "", comments)
-}
-
-func (uhdl *UserHandler) GetCommentReplys(c *gin.Context) {
-	commentId := c.Param("id")
-
-	if commentId == "" {
-		utils.Error(c, 400, "Invalid Comment", nil)
-		return
-	}
-
-	//call service
-	comments, statusCode, err := uhdl.service.GetCommentReplys(commentId)
-	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-
-	utils.Success(c, statusCode, "", comments)
-}
-
 func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
 	userIdAny, exists := c.Get("userId")
 	if !exists {
@@ -237,44 +126,6 @@ func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
 	}
 
 	utils.Success(c, 201, "Profile Update Successfully", nil)
-}
-
-func (uhdl *UserHandler) GetUserFollowers(c *gin.Context) {
-	userIdAny, exists := c.Get("userId")
-	if !exists {
-		utils.Error(c, 401, "Unauthorized Access", nil)
-		return
-	}
-
-	userId := userIdAny.(string)
-
-	//call service
-	followers, statusCode, err := uhdl.service.GetFollowers(userId)
-	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-	
-	utils.Success(c, statusCode, "", followers)
-}
-
-func (uhdl *UserHandler) GetUsersFollowing(c *gin.Context) {
-	userIdAny, exists := c.Get("userId")
-	if !exists {
-		utils.Error(c, 401, "Unauthorized Access", nil)
-		return
-	}
-
-	userId := userIdAny.(string)
-
-	//call service
-	followers, statusCode, err := uhdl.service.GetFollowing(userId)
-	if err != nil {
-		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
-		return
-	}
-	
-	utils.Success(c, statusCode, "", followers)
 }
 
 func (uhdl *UserHandler) GetAppealStatus(c *gin.Context) {
