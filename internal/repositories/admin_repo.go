@@ -16,6 +16,7 @@ type AdminRepository interface {
 	GetUserIdByUsername(string) (string, int, error)
 	GetUserArticles(string) ([]models.Article, int, error)
 	DeleteArticle(string) (int, error)
+	DeleteAppeals(string) (int, error)
 }
 
 type AdminRepo struct {
@@ -150,4 +151,16 @@ func (ar *AdminRepo) DeleteArticle(articleId string) (int, error) {
 
 	return 200, nil
 } 
+
+func (ar *AdminRepo) DeleteAppeals(userId string) (int, error) {
+	res := ar.db.Model(&models.Appeal{}).
+							Where("user_id = ?", userId).
+							Delete(models.Appeal{})
+
+	if res.Error != nil {
+		return 500, fmt.Errorf("failed to delele appeals")
+	}
+
+	return 200, nil
+}
 

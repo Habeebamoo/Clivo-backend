@@ -2,6 +2,7 @@ package services
 
 import (
 	"log"
+	"slices"
 
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/repositories"
@@ -62,7 +63,15 @@ func (as *AdminSvc) GetUsers() ([]models.UserProfileResponse, int, error) {
 }
 
 func (as *AdminSvc) GetAppeals() ([]models.Appeal, int, error) {
-	return as.repo.GetAppeals()
+	appeals, code, err := as.repo.GetAppeals()
+	if err != nil {
+		return appeals, code, err
+	}
+
+	//sort by latest
+	slices.Reverse(appeals)
+
+	return appeals, code, err
 }
 
 func (as *AdminSvc) GetUser(userId string) (models.UserResponse, int, error) {
@@ -164,7 +173,20 @@ func (as *AdminSvc) UnBanUser(userId string) (int, error) {
 	}
 
 	//un-ban if not
-	return as.repo.UpdateUserRestriction(userId, false)
+	code, err = as.repo.UpdateUserRestriction(userId, false)
+	if err != nil {
+		return code, err
+	}
+
+	//delete all user appeals
+	code, err = as.repo.DeleteAppeals(userId)
+	if err != nil {
+		return code, err
+	}
+
+	//notify user
+
+	return 200, nil
 }
 
 func (as *AdminSvc) GetArticlesByUsername(username string) ([]models.Article, int, error) {

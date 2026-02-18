@@ -4,10 +4,25 @@ import (
 	"fmt"
 
 	"github.com/Habeebamoo/Clivo/server/internal/models"
+	"github.com/Habeebamoo/Clivo/server/internal/repositories"
 )
 
-func (us *UserSvc) GetAppealStatus(userId string) (bool, int, error) {
-	user, code, err := us.repo.GetUserById(userId)
+type AppealService interface {
+	GetAppealStatus(string) (bool, int, error)
+	CreateAppeal(models.AppealRequest) (int, error)
+}
+
+type AppealSvc struct {
+	repo repositories.AppealRepository
+	userRepo repositories.UserRepository
+}
+
+func NewAppealService(repo repositories.AppealRepository) AppealService {
+	return &AppealSvc{repo: repo}
+}
+
+func (as *AppealSvc) GetAppealStatus(userId string) (bool, int, error) {
+	user, code, err := as.userRepo.GetUserById(userId)
 	if err != nil {
 		return false, code, err
 	}
@@ -15,14 +30,14 @@ func (us *UserSvc) GetAppealStatus(userId string) (bool, int, error) {
 	return user.IsBanned, 200, nil
 }
 
-func (us *UserSvc) CreateAppeal(appealReq models.AppealRequest) (int, error) {
-	user, code, err := us.repo.GetUserById(appealReq.UserId)
+func (as *AppealSvc) CreateAppeal(appealReq models.AppealRequest) (int, error) {
+	user, code, err := as.userRepo.GetUserById(appealReq.UserId)
 	if err != nil {
 		return code, err
 	}
 
 	//check user's appeals limit (3)
-	appeals, code, err := us.repo.GetUserAppeals(appealReq.UserId)
+	appeals, code, err := as.repo.GetUserAppeals(appealReq.UserId)
 	if err != nil {
 		return code, err
 	}
@@ -40,7 +55,7 @@ func (us *UserSvc) CreateAppeal(appealReq models.AppealRequest) (int, error) {
 	}
 
 	//call repo
-	code, err = us.repo.CreateAppeal(appeal)
+	code, err = as.repo.CreateAppeal(appeal)
 	if err != nil {
 		return code, err
 	}

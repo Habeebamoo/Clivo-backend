@@ -7,7 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.ArticleHandler, userHandler handlers.UserHandler, adminHandler handlers.AdminHandler) *gin.Engine {
+func SetupRoutes(
+	authHandler handlers.AuthHandler, 
+	articleHandler handlers.ArticleHandler, 
+	userHandler handlers.UserHandler, 
+	adminHandler handlers.AdminHandler, 
+	appealHandler handlers.AppealHandler,
+) *gin.Engine {
+	
 	r := gin.Default()
 
 	//middlewares chain
@@ -28,8 +35,8 @@ func SetupRoutes(authHandler handlers.AuthHandler, articleHandler handlers.Artic
 	api.GET("/user/:username/:title/comments", userHandler.GetArticleComments)
 	api.GET("/user/follow-status/:userId/:username", userHandler.GetFollowStatus)
 	api.GET("/comments/:id/replys", userHandler.GetCommentReplys)
-	api.GET("/user/appeal-status/:userId", userHandler.GetAppealStatus)
-	api.POST("/appeals", userHandler.SubmitAppeal)
+	api.GET("/user/appeal-status/:userId", appealHandler.GetAppealStatus)
+	api.POST("/appeals", appealHandler.SubmitAppeal)
 
 	//authentication routes
 	auth := api.Group("/auth")

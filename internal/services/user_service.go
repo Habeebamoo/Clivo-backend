@@ -22,8 +22,6 @@ type UserService interface {
 	GetCommentReplys(string) ([]models.CommentResponse, int, error)
 	GetFollowers(string) ([]models.SafeUserResponse, int, error)
 	GetFollowing(string) ([]models.SafeUserResponse, int, error)
-	GetAppealStatus(string) (bool, int, error)
-	CreateAppeal(models.AppealRequest) (int, error)
 }
 
 type UserSvc struct {
