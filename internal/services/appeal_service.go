@@ -17,8 +17,8 @@ type AppealSvc struct {
 	userRepo repositories.UserRepository
 }
 
-func NewAppealService(repo repositories.AppealRepository) AppealService {
-	return &AppealSvc{repo: repo}
+func NewAppealService(repo repositories.AppealRepository, userRepo repositories.UserRepository) AppealService {
+	return &AppealSvc{repo, userRepo}
 }
 
 func (as *AppealSvc) GetAppealStatus(userId string) (bool, int, error) {

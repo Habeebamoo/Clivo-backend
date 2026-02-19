@@ -157,7 +157,24 @@ func (as *AdminSvc) BanUser(userId string) (int, error) {
 	}
 
 	//ban if not
-	return as.repo.UpdateUserRestriction(userId, true)
+	code, err = as.repo.UpdateUserRestriction(userId, true)
+	if err != nil {
+		return code, err
+	}
+
+	//notify user
+	go func() {
+		//panic recovery
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("panic recovered from %v", r)
+			}
+		}()
+
+		NewEmailService().SendRestrictedUserEmail(user.Name, user.Email)
+	}()
+
+	return code, err
 }
 
 func (as *AdminSvc) UnBanUser(userId string) (int, error) {
@@ -185,6 +202,16 @@ func (as *AdminSvc) UnBanUser(userId string) (int, error) {
 	}
 
 	//notify user
+	go func() {
+		//panic recovery
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("panic recovered from %v", r)
+			}
+		}()
+
+		NewEmailService().SendUnrestrictedUserEmail(user.Name, user.Email)
+	}()
 
 	return 200, nil
 }

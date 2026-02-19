@@ -13,6 +13,8 @@ type EmailService interface {
 	SendWelcomeEmailToAdmin(string, string, string, string)
 	SendVerifiedUserEmail(string, string)
 	SendUnverifiedUserEmail(string, string)
+	SendRestrictedUserEmail(string, string)
+	SendUnrestrictedUserEmail(string, string)
 }
 
 type EmailSvc struct {}
@@ -344,4 +346,184 @@ func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
 	}
 
 	log.Println("...User Un-Verified Email Sent...")
+}
+
+func (ems *EmailSvc) SendRestrictedUserEmail(userName, userEmail string) {
+	email, _ := config.Get("ADMIN_EMAIL")
+	pass, _ := config.Get("EMAIL_PASS")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	if email == "" || pass == "" || clientUrl == "" {
+		panic("failed to get env variables")
+	}	
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+					<!-- logo -->
+					<tr>
+						<td style="padding: 20px;">
+							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p>Dear %s,</p>
+
+							<p>
+								We’re writing to inform you that your account has been temporarily restricted due to content that violates our Community Guidelines.
+							</p>
+
+							<p>
+								Specifically, we identified one or more published articles that contain material inconsistent with our policies regarding [e.g., harassment, misinformation, hate speech, spam, copyright infringement]. As a result, your publishing privileges have been temporarily suspended.
+							</p>
+
+							<p>
+								During this restriction period:
+							</p>
+
+							<ul>
+								<li>You won't be able to login</li>
+								<li>You will not be able to publish new articles.</li>
+								<li>Existing content may be under review or permanently deleted.</li>
+							</ul>
+
+							<p>
+								If you believe this action was taken in error, you may submit an appeal within 7 days by contacting our team at [clivoinc@gmail.com].
+							</p>
+
+							<p>
+								We value thoughtful and responsible contributions to our platform and hope you will continue to share your voice in accordance with our policies.
+							</p>
+
+							<div style="line-height: 0.4; margin-top: 30px;">
+								<p>Warm regards</p>
+								<p>The Clivo Team.</p>
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+
+							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
+							</div>
+
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+								This message was sent to 
+								<span style="text-decoration: underline;">%s</span>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, userName, userEmail)
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
+	m.SetHeader("To", userEmail)
+	m.SetHeader("Subject", "Notice of Temporary Account Restriction")
+	m.SetBody("text/html", html)
+
+	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
+	d.SSL = true
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	log.Println("...User Restriction Email Sent...")
+}
+
+func (ems *EmailSvc) SendUnrestrictedUserEmail(userName, userEmail string) {
+	email, _ := config.Get("ADMIN_EMAIL")
+	pass, _ := config.Get("EMAIL_PASS")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	if email == "" || pass == "" || clientUrl == "" {
+		panic("failed to get env variables")
+	}	
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+					<!-- logo -->
+					<tr>
+						<td style="padding: 20px;">
+							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p>Dear %s,</p>
+
+							<p>
+								We’re pleased to inform you that the restriction previously placed on your account has been lifted.
+							</p>
+
+							<p>
+								After reviewing your account, we have restored full access to your profile and publishing privileges. You may now continue creating and engaging on the platform as usual.
+							</p>
+
+							<p>
+								We appreciate your patience during the review process and your commitment to maintaining the standards of our community. If you have any questions or need clarification regarding our guidelines, please feel free to reach out to our support team.
+							</p>
+
+							<p>
+								Thank you for being a valued member of our community.
+							</p>
+
+							<div style="line-height: 0.4; margin-top: 30px;">
+								<p>Warm regards</p>
+								<p>The Clivo Team.</p>
+							</div>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+
+							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
+							</div>
+
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
+								This message was sent to 
+								<span style="text-decoration: underline;">%s</span>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, userName, userEmail)
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
+	m.SetHeader("To", userEmail)
+	m.SetHeader("Subject", "Your Account Restriction Has Been Lifted")
+	m.SetBody("text/html", html)
+
+	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
+	d.SSL = true
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+	log.Println("...User Un-Restriction Email Sent...")
 }
