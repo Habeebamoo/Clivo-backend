@@ -38,5 +38,5 @@ CREATE TABLE IF NOT EXISTS user_interests (
 -- +goose StatementBegin
 DROP TABLE user_interests;
 DROP TABLE profiles;
-DROP TABLE users;
+DROP TABLE users CASCADE;
 -- +goose StatementEnd

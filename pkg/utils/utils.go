@@ -17,9 +17,9 @@ import (
 
 	"github.com/Habeebamoo/Clivo/server/internal/config"
 	"github.com/Habeebamoo/Clivo/server/internal/models"
-	"github.com/cloudinary/cloudinary-go/v2"
-	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gin-gonic/gin"
+	"github.com/imagekit-developer/imagekit-go/v2"
+	"github.com/imagekit-developer/imagekit-go/v2/option"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -154,30 +154,54 @@ func GetTimeAgo(t time.Time) string {
 	}
 }
 
-func UploadImage(file multipart.File) (string, error) {
-	cldName, _ := config.Get("CLD_CLOUD_NAME")
-	apiKey, _ := config.Get("CLD_API_KEY")
-	apiSecret, _ := config.Get("CLD_API_SECRET")
+// func UploadImage2(file multipart.File) (string, error) {
+// 	cldName, _ := config.Get("CLD_CLOUD_NAME")
+// 	apiKey, _ := config.Get("CLD_API_KEY")
+// 	apiSecret, _ := config.Get("CLD_API_SECRET")
 
-	if cldName == "" || apiKey == "" || apiSecret == "" {
+// 	if cldName == "" || apiKey == "" || apiSecret == "" {
+// 		return "", fmt.Errorf("env variables missing")
+// 	}
+
+// 	cld, err := cloudinary.NewFromParams(cldName, apiKey, apiSecret)
+
+// 	if err != nil {
+// 		return "", fmt.Errorf("failed to connect to storage")
+// 	}
+
+// 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+// 	defer cancel()
+
+// 	uploadRes, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
+// 		Folder: "profile_pics",
+// 	})
+// 	if err != nil {
+// 		return "", fmt.Errorf("upload error")
+// 	}
+
+// 	return uploadRes.SecureURL, nil
+// }
+
+func UploadImage(file multipart.File) (string, error) {
+	key, _ := config.Get("IK_PRIVATE_KEY")
+	if key == "" {
 		return "", fmt.Errorf("env variables missing")
 	}
 
-	cld, err := cloudinary.NewFromParams(cldName, apiKey, apiSecret)
+	client := imagekit.NewClient(
+		option.WithPrivateKey(key),
+	)
 
-	if err != nil {
-		return "", fmt.Errorf("failed to connect to storage")
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	uploadRes, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
-		Folder: "profile_pics",
+	resp, err := client.Files.Upload(context.TODO(), imagekit.FileUploadParams{
+		File: file,
+		FileName: fmt.Sprintf("%s.jpg", GenerateRandomId()),
 	})
+
 	if err != nil {
 		return "", fmt.Errorf("upload error")
 	}
 
-	return uploadRes.SecureURL, nil
+	log.Println(resp.URL)
+
+	return resp.URL, nil
 }

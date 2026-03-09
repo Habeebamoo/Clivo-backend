@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS article_tags (
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE article_tags;
-DROP TABLE articles;
+DROP TABLE articles CASCADE;
 -- +goose StatementEnd
 
 
