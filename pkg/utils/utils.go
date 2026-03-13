@@ -154,34 +154,6 @@ func GetTimeAgo(t time.Time) string {
 	}
 }
 
-// func UploadImage2(file multipart.File) (string, error) {
-// 	cldName, _ := config.Get("CLD_CLOUD_NAME")
-// 	apiKey, _ := config.Get("CLD_API_KEY")
-// 	apiSecret, _ := config.Get("CLD_API_SECRET")
-
-// 	if cldName == "" || apiKey == "" || apiSecret == "" {
-// 		return "", fmt.Errorf("env variables missing")
-// 	}
-
-// 	cld, err := cloudinary.NewFromParams(cldName, apiKey, apiSecret)
-
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to connect to storage")
-// 	}
-
-// 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-// 	defer cancel()
-
-// 	uploadRes, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
-// 		Folder: "profile_pics",
-// 	})
-// 	if err != nil {
-// 		return "", fmt.Errorf("upload error")
-// 	}
-
-// 	return uploadRes.SecureURL, nil
-// }
-
 func UploadImage(file multipart.File) (string, error) {
 	key, _ := config.Get("IK_PRIVATE_KEY")
 	if key == "" {
@@ -200,8 +172,6 @@ func UploadImage(file multipart.File) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("upload error")
 	}
-
-	log.Println(resp.URL)
 
 	return resp.URL, nil
 }

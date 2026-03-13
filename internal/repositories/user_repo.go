@@ -3,6 +3,7 @@ package repositories
 import (
 	"fmt"
 
+
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"gorm.io/gorm"
 )
@@ -29,6 +30,8 @@ type UserRepository interface {
 	GetArticleTags(string) ([]models.ArticleTags, error)
 	GetArticleComments(string) ([]models.Comment, int, error)
 	GetCommentReplys(string) ([]models.Comment, int, error)
+	SubscriberExists(string) bool
+	CreateSubscriber(models.Subscriber) (int, error)
 }
 
 type UserRepo struct {
@@ -392,4 +395,24 @@ func (ur *UserRepo) GetCommentReplys(commentId string) ([]models.Comment, int, e
 	return comments, 200, nil
 }
 
+func (ur *UserRepo) SubscriberExists(email string) bool {
+	var subscriber models.Subscriber
+	res := ur.db.First(&subscriber, "email = ?", email)
+	
+	//no subscriber
+	if res.Error == gorm.ErrRecordNotFound {
+		return false
+	}
+
+	return true
+}
+
+func (ur *UserRepo) CreateSubscriber(subscriber models.Subscriber) (int, error) {
+	res := ur.db.Create(&subscriber)
+	if res.Error != nil {
+		return 500, fmt.Errorf("internal server error")
+	}
+
+	return 201, nil
+}
 

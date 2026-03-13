@@ -37,14 +37,6 @@ type Follow struct {
 	FollowingId  string  `json:"followingId"`
 }
 
-type Appeal struct {
-	UserId    string  `json:"userId"`
-	Name      string  `json:"name"`
-	Picture   string  `json:"picture"`
-	Username  string  `json:"username"`
-	Message   string  `json:"message"`
-}
-
 type UserRequest struct {
 	Name       string     `json:"name"`
 	Email      string     `json:"email"`
@@ -59,11 +51,6 @@ type ProfileUpdateRequest struct {
 	Bio      string
 	Picture  *multipart.File
 	FileAvailable bool
-}
-
-type AppealRequest struct {
-	UserId   string  `json:"userId"`
-	Message  string  `json:"message"`
 }
 
 type UserProfileResponse struct {

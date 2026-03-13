@@ -127,3 +127,25 @@ func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
 
 	utils.Success(c, 201, "Profile Update Successfully", nil)
 }
+
+func (uhdl *UserHandler) CreateSubscriber(c *gin.Context) {
+	var subscriberReq models.SubscriberRequest
+	if err := c.ShouldBindJSON(&subscriberReq); err != nil {
+		utils.Error(c, 400, "Invalid JSON Format", nil)
+		return
+	}
+
+	if subscriberReq.Email == "" {
+		utils.Error(c, 400, "Email Address Missing", nil)
+		return
+	}
+
+	//call service
+	statusCode, err := uhdl.service.CreateSubscriber(subscriberReq.Email)
+	if err != nil {
+		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	utils.Success(c, statusCode, "You have successfully subscribed.", nil)
+}

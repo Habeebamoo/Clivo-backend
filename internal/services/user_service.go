@@ -22,6 +22,7 @@ type UserService interface {
 	GetCommentReplys(string) ([]models.CommentResponse, int, error)
 	GetFollowers(string) ([]models.SafeUserResponse, int, error)
 	GetFollowing(string) ([]models.SafeUserResponse, int, error)
+	CreateSubscriber(string) (int, error)
 }
 
 type UserSvc struct {
@@ -203,4 +204,19 @@ func (us *UserSvc) GetArticles(username string) ([]models.SafeArticleResponse, i
 	}
 
 	return userArticles, 200, nil
+}
+
+func (us *UserSvc) CreateSubscriber(email string) (int, error) {
+	subscriber := models.Subscriber{
+		Email: email,
+		SubscriberId: utils.GenerateRandomId(),
+	}
+
+	//check if subscriber already exists
+	exists := us.repo.SubscriberExists(email)
+	if exists {
+		return 200, nil
+	}
+
+	return us.repo.CreateSubscriber(subscriber)
 }

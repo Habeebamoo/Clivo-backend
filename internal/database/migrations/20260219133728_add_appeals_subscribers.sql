@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS appeals (
 );
 
 CREATE TABLE IF NOT EXISTS subscribers (
-  subscriberId TEXT NOT NULL,
+  subscriber_id TEXT NOT NULL,
   email TEXT NOT NULL,
 
-  UNIQUE(subscriberId),
+  UNIQUE(subscriber_id),
   UNIQUE(email)
 );
 -- +goose StatementEnd

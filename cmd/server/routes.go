@@ -37,6 +37,7 @@ func SetupRoutes(
 	api.GET("/comments/:id/replys", userHandler.GetCommentReplys)
 	api.GET("/user/appeal-status/:userId", appealHandler.GetAppealStatus)
 	api.POST("/appeals", appealHandler.SubmitAppeal)
+	api.POST("/subscribe", userHandler.CreateSubscriber)
 
 	//authentication routes
 	auth := api.Group("/auth")
@@ -69,7 +70,7 @@ func SetupRoutes(
 		article.GET("/fyp", articleHandler.GetUserFyp)
 		article.DELETE("/:id", articleHandler.DeleteArticle)
 		article.POST("/like", articleHandler.LikeArticle)
-		article.GET("/:articleId/liked/:userId", articleHandler.HasLikedArticle)
+		//article.GET("/:articleId/liked/:userId", articleHandler.HasLikedArticle)
 		article.POST("/comment/:id", articleHandler.CommentArticle)
 		article.POST("/comment/:id/reply", articleHandler.ReplyComment)
 	}
