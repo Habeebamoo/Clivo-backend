@@ -166,8 +166,8 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", m.FormatAddress(email, "Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Welcome To Clivo")
+	m.SetHeader("To", email)
+	m.SetHeader("Subject", "New User On Clivo")
 	m.SetBody("text/html", html)
 
 	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
