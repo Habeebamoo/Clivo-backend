@@ -74,7 +74,7 @@ func (as *AuthSvc) SignUpUser(userReq models.UserRequest) (string, int, error) {
 		Bio: demoUserBio,
 		Picture: userReq.Picture,
 		ProfileUrl: profile,
-		Website: "",
+		Website: profile,
 		Following: 0,
 		Followers: 0,
 	}
