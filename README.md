@@ -1,4 +1,4 @@
-# 🚀 MyClivo Backend
+# 🚀 Clivo Backend
 
 Backend server for **Clivo** — a modern article publishing platform designed for performance, scalability, and clean architecture.
 
