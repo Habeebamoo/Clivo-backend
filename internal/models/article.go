@@ -65,6 +65,18 @@ type EditorJSContent struct {
 	Blocks []EditorJSBlock `json:"blocks"`
 }
 
+type EditorJSON struct {
+	Time    int64   `json:"time"`
+	Blocks  []Block `json:"blocks"`
+	Version string  `json:"version"`
+}
+
+type Block struct {
+	ID   string          `json:"id"`
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
+}
+
 type CommentResponse struct {
 	CommentId  string  `json:"commentId"`
 	ArticleId  string  `json:"articleId"`

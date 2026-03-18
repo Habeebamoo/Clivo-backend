@@ -111,6 +111,43 @@ func GenerateUniqueUsername(base string, exists func(string) bool) string {
 	return username
 }
 
+// CleanEditorJSON cleans all text fields inside an Editor.js JSON RawMessage
+func CleanEditorJSON(raw json.RawMessage) json.RawMessage {
+	var editor models.EditorJSON
+	if err := json.Unmarshal(raw, &editor); err != nil {
+		return nil
+	}
+
+	for i, block := range editor.Blocks {
+		switch block.Type {
+		case "header", "paragraph":
+			var dataMap map[string]interface{}
+			if err := json.Unmarshal(block.Data, &dataMap); err != nil {
+				continue
+			}
+
+			if text, ok := dataMap["text"].(string); ok {
+				// Replace escaped \u0026nbsp; and trim
+				text = strings.ReplaceAll(text, "\u0026nbsp;", " ")
+				text = strings.TrimSpace(text)
+				dataMap["text"] = text
+			}
+
+			// Marshal cleaned data back to RawMessage
+			cleanData, _ := json.Marshal(dataMap)
+			editor.Blocks[i].Data = cleanData
+		}
+	}
+
+	// Marshal cleaned editor JSON back to RawMessage
+	cleanJSON, err := json.Marshal(editor)
+	if err != nil {
+		return nil
+	}
+
+	return json.RawMessage(cleanJSON)
+}
+
 func GetArticleReadTime(jsonContent string) int {
 	var content models.EditorJSContent
 	err := json.Unmarshal([]byte(jsonContent), &content)

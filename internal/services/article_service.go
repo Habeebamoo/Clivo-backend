@@ -41,7 +41,7 @@ func (as *ArticleSvc) CreateArticle(articleReq models.ArticleRequest, userId str
 	//upload article image
 	articleImage, err := utils.UploadImage(*articleReq.Picture)
 	if err != nil {
-		return 500, fmt.Errorf("failed to upload")
+		return 500, fmt.Errorf("failed to upload: %v\n", err)
 	}
 
 	//assign article
@@ -138,7 +138,7 @@ func (as *ArticleSvc) GetArticle(id string) (models.ArticleResponse, int, error)
 		AuthorProfileUrl: author.ProfileUrl,
 		AuthorVerified: author.Verified,
 		Title: article.Title,
-		Content: article.Content,
+		Content: utils.CleanEditorJSON(article.Content),
 		Picture: article.Picture,
 		Tags: tags,
 		Likes: articleLikes,
