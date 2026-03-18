@@ -102,8 +102,7 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 	//user info
 	name := userInfo["name"].(string)
 	email := userInfo["email"].(string)
-	picture := userInfo["picture"].(string)
-
+	picture, _ := config.Get("DEMO_AVATAR")
 
 	//use state to determine admin or user
 	state := c.Query("state")
