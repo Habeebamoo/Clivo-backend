@@ -7,6 +7,12 @@ import (
 )
 
 func (ah *ArticleHandler) CommentArticle(c *gin.Context) {
+	_, exists := c.Get("userId")
+	if !exists {
+		utils.Error(c, 401, "", nil)
+		return
+	}
+
 	var replyRequest models.CommentRequest
 	if err := c.ShouldBindJSON(&replyRequest); err != nil {
 		utils.Error(c, 400, "Invalid JSON Format", nil)
@@ -30,6 +36,12 @@ func (ah *ArticleHandler) CommentArticle(c *gin.Context) {
 }
 
 func (ah *ArticleHandler) ReplyComment(c *gin.Context) {
+		_, exists := c.Get("userId")
+	if !exists {
+		utils.Error(c, 401, "", nil)
+		return
+	}
+	
 	var replyRequest models.ReplyRequest
 	if err := c.ShouldBindJSON(&replyRequest); err != nil {
 		utils.Error(c, 400, "Invalid JSON Format", nil)

@@ -8,6 +8,12 @@ import (
 
 
 func (ah *ArticleHandler) LikeArticle(c *gin.Context) {
+	_, exists := c.Get("userId")
+	if !exists {
+		utils.Error(c, 401, "", nil)
+		return
+	}
+
 	var articleLikeRequest models.Like
 	if err := c.ShouldBindJSON(&articleLikeRequest); err != nil {
 		utils.Error(c, 400, "Invalid JSON Format", nil)
