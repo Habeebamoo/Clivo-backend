@@ -123,6 +123,8 @@ func (us *UserSvc) GetArticle(username string, articleTitleCode string) (models.
 		return models.SafeArticleResponse{}, code, err
 	}
 
+	cleanedContent, _ := utils.CleanEditorJS(article.Content)
+
 	//build response
 	articleRespose := models.SafeArticleResponse{
 		ArticleId: article.ArticleId,
@@ -132,7 +134,7 @@ func (us *UserSvc) GetArticle(username string, articleTitleCode string) (models.
 		AuthorVerified: author.Verified,
 		AuthorBio: author.Bio,
 		Title: article.Title,
-		Content: article.Content,
+		Content: cleanedContent,
 		Picture: article.Picture,
 		Tags: tags,
 		Likes: articleLikes,

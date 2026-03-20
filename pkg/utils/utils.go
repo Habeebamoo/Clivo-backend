@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"html"
 	"log"
 	"math"
 	mrand "math/rand"
@@ -111,41 +112,60 @@ func GenerateUniqueUsername(base string, exists func(string) bool) string {
 	return username
 }
 
-// CleanEditorJSON cleans all text fields inside an Editor.js JSON RawMessage
-func CleanEditorJSON(raw json.RawMessage) json.RawMessage {
-	var editor models.EditorJSON
-	if err := json.Unmarshal(raw, &editor); err != nil {
-		return nil
+// Entry point
+func CleanEditorJS(raw json.RawMessage) (json.RawMessage, error) {
+	var data interface{}
+
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return nil, err
 	}
 
-	for i, block := range editor.Blocks {
-		switch block.Type {
-		case "header", "paragraph":
-			var dataMap map[string]interface{}
-			if err := json.Unmarshal(block.Data, &dataMap); err != nil {
-				continue
-			}
+	cleaned := cleanRecursive(data)
 
-			if text, ok := dataMap["text"].(string); ok {
-				// Replace escaped \u0026nbsp; and trim
-				text = strings.ReplaceAll(text, "\u0026nbsp;", " ")
-				text = strings.TrimSpace(text)
-				dataMap["text"] = text
-			}
-
-			// Marshal cleaned data back to RawMessage
-			cleanData, _ := json.Marshal(dataMap)
-			editor.Blocks[i].Data = cleanData
-		}
-	}
-
-	// Marshal cleaned editor JSON back to RawMessage
-	cleanJSON, err := json.Marshal(editor)
+	out, err := json.Marshal(cleaned)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return json.RawMessage(cleanJSON)
+	return out, nil
+}
+
+// Recursive cleaner
+func cleanRecursive(v interface{}) interface{} {
+	switch val := v.(type) {
+
+	case map[string]interface{}:
+		for k, v2 := range val {
+			val[k] = cleanRecursive(v2)
+		}
+		return val
+
+	case []interface{}:
+		for i, v2 := range val {
+			val[i] = cleanRecursive(v2)
+		}
+		return val
+
+	case string:
+		return cleanString(val)
+
+	default:
+		return val
+	}
+}
+
+// Actual string cleaning logic
+func cleanString(s string) string {
+	// Decode HTML entities (&nbsp; -> space)
+	s = html.UnescapeString(s)
+
+	// Replace non-breaking space (unicode 0xA0) with normal space
+	s = strings.ReplaceAll(s, "\u00A0", " ")
+
+	// Trim trailing spaces
+	s = strings.TrimRight(s, " ")
+
+	return s
 }
 
 func GetArticleReadTime(jsonContent string) int {

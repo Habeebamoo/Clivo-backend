@@ -1,0 +1,25 @@
+secure /api/subscriber endpoint
+
+{
+  "time": 1773864669518, 
+  "blocks": [
+    { 
+      "id": "4N7NHqimU6", 
+      "data": { "text": "Go vs Rust&nbsp;", "level": 2 }, 
+      "type": "header"
+    }
+  ], 
+  "version": "2.31.0"
+}
+
+i use editorjs as an article editor, and i store in postgres as JSONB, json.RawMessage as the Go model, but if a paragrah as a space at the end it always adds &nbsp; which is also renderred on the frontend, right a program to accept it as paramenter and return a filtered vsersion.........{
+  "time": 1773864669518, 
+  "blocks": [
+    { 
+      "id": "4N7NHqimU6", 
+      "data": { "text": "Go vs Rust&nbsp;", "level": 2 }, 
+      "type": "header"
+    }
+  ], 
+  "version": "2.31.0"
+}........ it should be .block.map or something......golang

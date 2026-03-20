@@ -68,7 +68,7 @@ func (ahdl *AuthHandler) GoogleCallBack(c *gin.Context) {
 	//get token
 	token, err := config.OauthConfig.Exchange(context.WithValue(context.Background(), oauth2.HTTPClient, httpClient), code)
 	if err != nil {
-		redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, "Token exchange error")
+		redirectUrl := fmt.Sprintf("%s/auth/error?reason=%s", clientOrigin, err.Error())
 		c.Redirect(http.StatusFound, redirectUrl)
 		return
 	}

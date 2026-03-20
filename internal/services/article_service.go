@@ -129,6 +129,9 @@ func (as *ArticleSvc) GetArticle(id string) (models.ArticleResponse, int, error)
 		return models.ArticleResponse{}, code, err
 	}
 
+	//sanitize JSON content
+	cleanedContent, _ := utils.CleanEditorJS(article.Content)
+
 	//build response
 	articleRespose := models.ArticleResponse{
 		ArticleId: article.ArticleId,
@@ -138,7 +141,7 @@ func (as *ArticleSvc) GetArticle(id string) (models.ArticleResponse, int, error)
 		AuthorProfileUrl: author.ProfileUrl,
 		AuthorVerified: author.Verified,
 		Title: article.Title,
-		Content: utils.CleanEditorJSON(article.Content),
+		Content: cleanedContent,
 		Picture: article.Picture,
 		Tags: tags,
 		Likes: articleLikes,
