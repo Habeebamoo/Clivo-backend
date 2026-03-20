@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"github.com/Habeebamoo/Clivo/server/internal/handlers"
 	"github.com/Habeebamoo/Clivo/server/internal/middlewares"
 	response "github.com/Habeebamoo/Clivo/server/pkg/utils"
@@ -37,7 +39,7 @@ func SetupRoutes(
 	api.GET("/comments/:id/replys", userHandler.GetCommentReplys)
 	api.GET("/user/appeal-status/:userId", appealHandler.GetAppealStatus)
 	api.POST("/appeals", appealHandler.SubmitAppeal)
-	api.POST("/subscribe", userHandler.CreateSubscriber)
+	api.POST("/subscribe", middlewares.RateLimiter(time.Minute, 2), userHandler.CreateSubscriber)
 
 	//authentication routes
 	auth := api.Group("/auth")
