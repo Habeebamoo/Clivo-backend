@@ -193,7 +193,7 @@ func (as *ArticleSvc) GetUserFeed(userId string) ([]models.SafeArticleResponse, 
 	}
 
 	//combine articles
-	userFeeds = append(userFeeds, popularArticles...)
+	userFeeds = utils.MergeUniqueArticle(userFeeds, popularArticles)
 
 	//build response
 	articleFeed := []models.SafeArticleResponse{}
@@ -245,7 +245,7 @@ func (as *ArticleSvc) GetUserFyp(userId string) ([]models.SafeArticleResponse, i
 	}
 
 	//combine articles
-	userFyps = append(userFyps, popularArticles...)
+	userFyps = utils.MergeUniqueArticle(userFyps, popularArticles)
 
 	//build response
 	articleFeed := []models.SafeArticleResponse{}

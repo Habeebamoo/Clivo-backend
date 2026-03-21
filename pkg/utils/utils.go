@@ -168,6 +168,20 @@ func cleanString(s string) string {
 	return s
 }
 
+func MergeUniqueArticle(a1, a2 []models.Article) []models.Article {
+	seen := make(map[string]bool)
+	results := []models.Article{}
+
+	for _, article := range append(a1, a2...) {
+		if !seen[article.ArticleId] {
+			seen[article.ArticleId] = true
+			results = append(results, article)
+		}
+	}
+
+	return results
+}
+
 func GetArticleReadTime(jsonContent string) int {
 	var content models.EditorJSContent
 	err := json.Unmarshal([]byte(jsonContent), &content)
