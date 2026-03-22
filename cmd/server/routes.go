@@ -23,6 +23,9 @@ func SetupRoutes(
 	r.Use(middlewares.CORS())
 	r.Use(middlewares.CustomRecovery())
 
+	//social media bots / SEO 
+	r.GET("/:username/:slug", userHandler.GetArticleSEO)
+
 	api := r.Group("/api")
 
 	//health check

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Habeebamoo/Clivo/server/internal/config"
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/repositories"
 	"github.com/Habeebamoo/Clivo/server/pkg/utils"
@@ -18,6 +19,8 @@ type UserService interface {
 	GetUser(string) (models.SafeUserResponse, int, error)
 	GetArticle(string, string) (models.SafeArticleResponse, int, error)
 	GetArticles(string) ([]models.SafeArticleResponse, int, error)
+	GetArticleForSEO(string, string) (models.Article, error) 
+	GenerateSEOHtml(models.Article) string
 	GetArticleComments(string, string) ([]models.CommentResponse, int, error)
 	GetCommentReplys(string) ([]models.CommentResponse, int, error)
 	GetFollowers(string) ([]models.SafeUserResponse, int, error)
@@ -206,6 +209,54 @@ func (us *UserSvc) GetArticles(username string) ([]models.SafeArticleResponse, i
 	}
 
 	return userArticles, 200, nil
+}
+
+func (us *UserSvc) GetArticleForSEO(username, slug string) (models.Article, error) {
+	//get authorId
+	authorId, _, err := us.repo.GetArticleAuthorIdByUsername(username)
+	if err != nil {
+		return models.Article{}, err
+	}
+
+	//get article
+	articleSlug := fmt.Sprintf("%s/%s", username, slug)
+	article, _, err := us.repo.GetArticleBySlug(authorId, articleSlug)
+	if err != nil {
+		return models.Article{}, err
+	}
+	
+	return article, err
+}
+
+func (us *UserSvc) GenerateSEOHtml(article models.Article) string {
+	clientURL, _ := config.Get("CLIENT_URL")
+	url := fmt.Sprintf("%s/%s", clientURL, article.Slug)
+
+	description := utils.ExtractExcerpt(article.Content)
+
+	return fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8" />
+
+				<title>%s</title>
+				<meta name="description" content="%s" />
+
+				<meta property="og:type" content="article" />
+				<meta property="og:title" content="%s" />
+				<meta property="og:description" content="%s" />
+				<meta property="og:image" content="%s" />
+				<meta property="og:url" content="%s" />
+
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta name="twitter:title" content="%s" />
+				<meta name="twitter:description" content="%s" />
+				<meta name="twitter:image" content="%s" />
+			</head>
+			<body></body>
+		</html>
+	`, article.Title, description, article.Title, description, article.Picture, url, article.Title, description, article.Picture)
 }
 
 func (us *UserSvc) CreateSubscriber(email string) (int, error) {

@@ -246,3 +246,60 @@ func UploadImage(file multipart.File) (string, error) {
 
 	return resp.URL, nil
 }
+
+func StripHtml(s string) string {
+	re := regexp.MustCompile("<.*?>")
+	return re.ReplaceAllString(s, "")
+}
+
+func Truncate(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+
+	return s[:max] + "..."
+}
+
+func ExtractExcerpt(content json.RawMessage) string {
+	var data struct {
+		Blocks []struct {
+			Type string `json:"type"`
+			Data struct {
+				Text string `json:"text"`
+			} `json:"data"`
+		} `json:"blocks"`
+	}
+
+	_ = json.Unmarshal(content, &data)
+
+	for _, b := range data.Blocks {
+		if b.Type == "paragraph" && b.Data.Text != "" {
+			text := StripHtml(b.Data.Text)
+			return Truncate(text, 180)
+		}
+	}
+
+	return "Read this article on Clivo"
+}
+
+func IsBot(ua string) bool {
+	bots := []string{
+		"facebookexternalhit",
+		"Twitterbot",
+		"LinkedInBot",
+		"WhatsApp",
+		"Slackbot",
+		"Discordbot",
+		"Googlebot",
+	}
+
+	ua = strings.ToLower(ua)
+
+	for _, b := range bots {
+		if strings.Contains(ua, strings.ToLower(b)) {
+			return true
+		}
+	}
+
+	return false
+}

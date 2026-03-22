@@ -1,6 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/Habeebamoo/Clivo/server/internal/config"
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/services"
 	"github.com/Habeebamoo/Clivo/server/pkg/utils"
@@ -85,6 +89,31 @@ func (uhdl *UserHandler) GetUserArticle(c *gin.Context) {
 	}
 
 	utils.Success(c, statusCode, "", article)
+}
+
+func (uhdl *UserHandler) GetArticleSEO(c *gin.Context) {
+	userAgent := c.GetHeader("User-Agent")
+
+	username := c.Param("username")
+	slug := c.Param("slug")
+
+	article, err := uhdl.service.GetArticleForSEO(username, slug)
+	if err != nil {
+		utils.Error(c, 404, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	if utils.IsBot(userAgent) {
+		html := uhdl.service.GenerateSEOHtml(article)
+
+		c.Data(200, "text/html; charset=utf-8", []byte(html))
+		return
+	}
+
+	clientOrigin, _ := config.Get("CLIENT_URL")
+	url := fmt.Sprintf("%s/%s/%s", clientOrigin, username, slug)
+
+	c.Redirect(http.StatusFound, url)
 }
 
 func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
