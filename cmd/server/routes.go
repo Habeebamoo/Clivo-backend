@@ -91,6 +91,7 @@ func SetupRoutes(
 		admin.POST("/unrestrict/:id", adminHandler.UnRestrictUser)
 		admin.GET("/:username/articles", adminHandler.GetArticlesByUsername)
 		admin.DELETE("/article/:id", adminHandler.DeleteArticle)
+		admin.POST("/sendmail", adminHandler.SendMail)
 	}
 
 	return r

@@ -9,6 +9,7 @@ import (
 )
 
 type EmailService interface {
+	SendAdminMail([]string) error
 	SendWelcomeEmail(string, string, string)
 	SendWelcomeEmailToAdmin(string, string, string, string)
 	SendVerifiedUserEmail(string, string)
@@ -21,6 +22,101 @@ type EmailSvc struct {}
 
 func NewEmailService() EmailService {
 	return &EmailSvc{}
+}
+
+func (ems *EmailSvc) SendAdminMail(emails []string) error {
+	email, _ := config.Get("ADMIN_EMAIL")
+	pass, _ := config.Get("EMAIL_PASS")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	if email == "" || pass == "" || clientUrl == "" {
+		panic("failed to get env variables")
+	}
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+					<!-- logo -->
+					<tr>
+						<td style="padding: 20px; display: flex; justify-content: start; align-items: center; gap: 5px;">
+							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p>Hey there,</p>
+
+							<p>
+                You signed up for Clivo a few days ago - and i noticed you haven't published anything yet.
+              </p>
+
+              <p>
+                That's totally normal. The blank page is the hardest part.
+              </p>
+
+              <p>
+                So here's a low-pressure challenge: write anything. It dosen't have to be perfect. A short opinion, a how-to, a story from your week - just hit publish.
+              </p>
+
+              <p>
+                Your first article is the hardest one. After that, it gets easier.
+              </p>
+
+              <p>
+                &#x1F449; Start writing on Clivo.
+              </p>
+
+              <p>
+                If you're stuck or have any questions, just reply to this email - I read every message.
+              </p>
+
+              <p>Cheers.</p>
+
+							<div style="line-height: 0.4; margin-top: 30px;">
+								<p>Habeeb Amoo</p>
+								<p>Creator, Clivo.</p>
+							</div>
+
+							<p style="margin: 50px 0;">
+								<a href="%s" style="background-color: rgb(20,20,20); color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold;">Create Article</a>
+							</p>
+						</td>
+					</tr>
+
+					<tr>
+						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
+							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+
+							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
+								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
+							</div>
+
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, clientUrl)
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
+	m.SetHeader("To", emails...)
+	m.SetHeader("Subject", "Welcome To Clivo")
+	m.SetBody("text/html", html)
+
+	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
+	d.SSL = true
+
+	if err := d.DialAndSend(m); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) {
