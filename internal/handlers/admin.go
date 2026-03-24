@@ -151,3 +151,14 @@ func (ahdl *AdminHandler) DeleteArticle(c *gin.Context) {
 
 	utils.Success(c, statusCode, "Article Deleted Successfully", nil)
 }
+
+func (ahdl *AdminHandler) SendMail(c *gin.Context) {
+	//call service
+	statusCode, err := ahdl.service.SendMail()
+	if err != nil {
+		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	utils.Success(c, statusCode, "Emails Sent", nil)
+}

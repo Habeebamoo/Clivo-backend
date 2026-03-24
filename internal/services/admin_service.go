@@ -19,6 +19,7 @@ type AdminService interface {
 	UnBanUser(string) (int, error)
 	GetArticlesByUsername(string) ([]models.Article, int, error)
 	DeleteUserArticle(string) (int, error)
+	SendMail() (int, error)
 }
 
 type AdminSvc struct {
@@ -234,4 +235,26 @@ func (as *AdminSvc) GetArticlesByUsername(username string) ([]models.Article, in
 
 func (as *AdminSvc) DeleteUserArticle(articleId string) (int, error) {
 	return as.repo.DeleteArticle(articleId)
+}
+
+func (as *AdminSvc) SendMail() (int, error) {
+	//get all users
+	users, code, err := as.repo.GetUsers()
+	if err != nil {
+		return code, err
+	}
+
+	var userEmails []string
+
+	for _, user := range users {
+		userEmails = append(userEmails, user.Email)
+	}
+
+	//call email service
+	err = NewEmailService().SendAdminMail(userEmails)
+	if err != nil {
+		return 500, err
+	}
+
+	return 200, nil
 }
