@@ -106,7 +106,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 	client := resend.NewClient(apiKey)
 
 	params := &resend.SendEmailRequest{
-		From: "Habeeb from Clivo <noreply@myclivo.com>",
+		From: "Habeeb from Clivo <hello@myclivo.com>",
 		To: emails,
 		Subject: "You joined Clivo - What's stopping you?",
 		Html: html,
