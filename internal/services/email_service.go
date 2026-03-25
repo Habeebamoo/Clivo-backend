@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/Habeebamoo/Clivo/server/internal/config"
+	"github.com/resend/resend-go/v3"
 	"gopkg.in/gomail.v2"
 )
 
@@ -25,11 +26,10 @@ func NewEmailService() EmailService {
 }
 
 func (ems *EmailSvc) SendAdminMail(emails []string) error {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
+	apiKey, _ := config.Get("RESEND_API_KEY")
 	clientUrl, _ := config.Get("CLIENT_URL")
 
-	if email == "" || pass == "" || clientUrl == "" {
+	if clientUrl == "" {
 		panic("failed to get env variables")
 	}
 
@@ -103,19 +103,20 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 		</html>
 	`, clientUrl)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
-	m.SetHeader("To", emails...)
-	m.SetHeader("Subject", "Welcome To Clivo")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
-
-	if err := d.DialAndSend(m); err != nil {
-		return err
+	params := &resend.SendEmailRequest{
+		From: "Habeeb from Clivo <noreply@myclivo.com>",
+		To: emails,
+		Subject: "You joined Clivo - What's stopping you?",
+		Html: html,
 	}
 
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		return err
+	}
+	
 	return nil
 }
 

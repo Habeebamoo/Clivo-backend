@@ -25,6 +25,7 @@ func SetupRoutes(
 
 	//social media bots / SEO 
 	r.GET("/:username/:slug", userHandler.GetArticleSEO)
+	//r.POST("/sendmail", adminHandler.SendMail)
 
 	api := r.Group("/api")
 
