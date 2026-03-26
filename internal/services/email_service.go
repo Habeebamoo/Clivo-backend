@@ -33,6 +33,8 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 		panic("failed to get env variables")
 	}
 
+	imgUrl := fmt.Sprintf("%s/logo.png", clientUrl)
+
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
@@ -41,7 +43,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 					<!-- logo -->
 					<tr>
 						<td style="padding: 20px; display: flex; justify-content: start; align-items: center; gap: 5px;">
-							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
+							<img src="%s" style="height: 40px">
 							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
 						</td>
 					</tr>
@@ -92,7 +94,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
 
 							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
+								<img src="%s" style="height: 15px">
 								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
 							</div>
 
@@ -101,7 +103,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 				</table>
 			</body>
 		</html>
-	`, clientUrl)
+	`, imgUrl, clientUrl, imgUrl)
 
 	client := resend.NewClient(apiKey)
 
