@@ -3,6 +3,7 @@ package services
 import (
 	"log"
 	"slices"
+	"time"
 
 	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/Habeebamoo/Clivo/server/internal/repositories"
@@ -244,16 +245,9 @@ func (as *AdminSvc) SendMail() (int, error) {
 		return code, err
 	}
 
-	var userEmails []string
-
 	for _, user := range users {
-		userEmails = append(userEmails, user.Email)
-	}
-
-	//call email service
-	err = NewEmailService().SendAdminMail(userEmails)
-	if err != nil {
-		return 500, err
+		NewEmailService().SendAdminMail(user.Name, user.Email)
+		time.Sleep(5*time.Second)
 	}
 
 	return 200, nil

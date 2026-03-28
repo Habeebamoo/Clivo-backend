@@ -10,7 +10,7 @@ import (
 )
 
 type EmailService interface {
-	SendAdminMail([]string) error
+	SendAdminMail(string, string) error
 	SendWelcomeEmail(string, string, string)
 	SendWelcomeEmailToAdmin(string, string, string, string)
 	SendVerifiedUserEmail(string, string)
@@ -25,7 +25,7 @@ func NewEmailService() EmailService {
 	return &EmailSvc{}
 }
 
-func (ems *EmailSvc) SendAdminMail(emails []string) error {
+func (ems *EmailSvc) SendAdminMail(name, email string) error {
 	apiKey, _ := config.Get("RESEND_API_KEY")
 	clientUrl, _ := config.Get("CLIENT_URL")
 
@@ -50,7 +50,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 
 					<tr>
 						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Hey there,</p>
+							<p>Hi %s,</p>
 
 							<p>
                 You signed up for Clivo a few days ago - and i noticed you haven't published anything yet.
@@ -103,13 +103,13 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 				</table>
 			</body>
 		</html>
-	`, imgUrl, clientUrl, imgUrl)
+	`, imgUrl, name, clientUrl, imgUrl)
 
 	client := resend.NewClient(apiKey)
 
 	params := &resend.SendEmailRequest{
 		From: "Habeeb from Clivo <hello@myclivo.com>",
-		To: emails,
+		To: []string{email},
 		Subject: "You joined Clivo - What's stopping you?",
 		Html: html,
 	}
@@ -119,6 +119,7 @@ func (ems *EmailSvc) SendAdminMail(emails []string) error {
 		return err
 	}
 	
+	log.Println("Email Request Received")
 	return nil
 }
 
