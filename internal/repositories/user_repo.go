@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	GetUserById(string) (models.UserResponse, int, error)
+	UserExists(string) bool
 	UpdateUserProfile(string, models.ProfileUpdateRequest) (int, error)
 	UpdateUserProfileWithPicture(string, models.ProfileUpdateRequest, string) (int, error)
 	IsFollowing(models.Follow) (bool, error)
@@ -58,6 +59,17 @@ func (ur *UserRepo) GetUserById(userId string) (models.UserResponse, int, error)
 	}
 
 	return user, 200, nil
+}
+
+func (ur *UserRepo) UserExists(email string) bool {
+	var user models.User
+	res := ur.db.First(&user, "email = ?", email)
+
+	if res.Error == gorm.ErrRecordNotFound {
+		return false
+	}
+
+	return true
 }
 
 func (ur *UserRepo) UpdateUserProfile(userId string, profileReq models.ProfileUpdateRequest) (int, error) {
