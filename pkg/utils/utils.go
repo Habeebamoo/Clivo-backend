@@ -57,9 +57,9 @@ func SetCookies(c *gin.Context, token string) {
 		Value: token,
 		Path: "/",
 		Domain: "",
-		Expires: time.Now().Add(1*time.Hour),
+		Expires: time.Now().Add(24*time.Hour),
 		MaxAge: 3600,
-		Secure: false, //true for production
+		Secure: true, //true for production
 		HttpOnly: true,
 	})
 }
@@ -71,7 +71,7 @@ func RemoveCookies(c *gin.Context) {
 		Path: "/",
 		Domain: "",
 		MaxAge: -1,
-		Secure: false, // true for production
+		Secure: true, // true for production
 		HttpOnly: true,
 	})
 }
