@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/Habeebamoo/Clivo/server/internal/config"
@@ -72,12 +71,6 @@ func (us *UserSvc) GetUserProfile(userId string) (models.UserProfileResponse, in
 }
 
 func (us *UserSvc) UpdateUserProfile(userId string, profileReq models.ProfileUpdateRequest) (int, error) {
-	//check if email exists
-	exists := us.repo.UserExists(profileReq.Email)
-	if exists {
-		return http.StatusConflict, fmt.Errorf("user with this email already exists")
-	}
-	
 	if !profileReq.FileAvailable {
 		//update profile without picture
 		return us.repo.UpdateUserProfile(userId, profileReq)

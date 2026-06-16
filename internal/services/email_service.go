@@ -6,7 +6,6 @@ import (
 
 	"github.com/Habeebamoo/Clivo/server/internal/config"
 	"github.com/resend/resend-go/v3"
-	"gopkg.in/gomail.v2"
 )
 
 type EmailService interface {
@@ -28,10 +27,6 @@ func NewEmailService() EmailService {
 func (ems *EmailSvc) SendAdminMail(name, email string) error {
 	apiKey, _ := config.Get("RESEND_API_KEY")
 	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if clientUrl == "" {
-		panic("failed to get env variables")
-	}
 
 	imgUrl := fmt.Sprintf("%s/logo.png", clientUrl)
 
@@ -124,13 +119,8 @@ func (ems *EmailSvc) SendAdminMail(name, email string) error {
 }
 
 func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
+	apiKey, _ := config.Get("RESEND_API_KEY")
 	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -187,17 +177,18 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 		</html>
 	`, userName, fmt.Sprintf("%s/home/create", clientUrl), userEmail)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Welcome To Clivo")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
+	params := &resend.SendEmailRequest{
+		From: "Clivo <hello@myclivo.com>",
+		To: []string{userEmail},
+		Subject: "Welcome To Clivo",
+		Html: html,
+	}
 
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...Welcome Email Sent...")
@@ -205,13 +196,9 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 
 //welcome email to admin
 func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, interests string) {
+	apiKey, _ := config.Get("RESEND_API_KEY")
 	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
 	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -263,31 +250,26 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 			</body>
 		</html>
 	`, userName, userEmail, userUsername, fmt.Sprintf("%s/%s", clientUrl, userUsername))
+	
+	client := resend.NewClient(apiKey)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Clivo"))
-	m.SetHeader("To", email)
-	m.SetHeader("Subject", "New User On Clivo")
-	m.SetBody("text/html", html)
+	params := &resend.SendEmailRequest{
+		From: "Clivo <hello@myclivo.com>",
+		To: []string{email},
+		Subject: "New User on Clivo",
+		Html: html,
+	}
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
-
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...Welcome Email To Admin Sent...")
 }
 
 func (ems *EmailSvc) SendVerifiedUserEmail(userName, userEmail string) {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
-	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}
+	apiKey, _ := config.Get("RESEND_API_KEY")
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -346,31 +328,25 @@ func (ems *EmailSvc) SendVerifiedUserEmail(userName, userEmail string) {
 		</html>
 	`, userName, userEmail)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Your account is now verified")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
+	params := &resend.SendEmailRequest{
+		From: "Habeeb from Clivo <hello@myclivo.com>",
+		To: []string{userEmail},
+		Subject: "Your account is now verified",
+		Html: html,
+	}
 
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...User Verified Email Sent...")
 }
 
-
 func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
-	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}
+	apiKey, _ := config.Get("RESEND_API_KEY")
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -432,30 +408,25 @@ func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
 		</html>
 	`, userName, userEmail)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Update regarding your verification status")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
+	params := &resend.SendEmailRequest{
+		From: "Habeeb from Clivo <hello@myclivo.com>",
+		To: []string{userEmail},
+		Subject: "Update regarding your verification status",
+		Html: html,
+	}
 
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...User Un-Verified Email Sent...")
 }
 
 func (ems *EmailSvc) SendRestrictedUserEmail(userName, userEmail string) {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
-	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}	
+	apiKey, _ := config.Get("RESEND_API_KEY")
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -527,30 +498,25 @@ func (ems *EmailSvc) SendRestrictedUserEmail(userName, userEmail string) {
 		</html>
 	`, userName, userEmail)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Notice of Temporary Account Restriction")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
+	params := &resend.SendEmailRequest{
+		From: "Habeeb from Clivo <hello@myclivo.com>",
+		To: []string{userEmail},
+		Subject: "Notice of Temporary Account Restriction",
+		Html: html,
+	}
 
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...User Restriction Email Sent...")
 }
 
 func (ems *EmailSvc) SendUnrestrictedUserEmail(userName, userEmail string) {
-	email, _ := config.Get("ADMIN_EMAIL")
-	pass, _ := config.Get("EMAIL_PASS")
-	clientUrl, _ := config.Get("CLIENT_URL")
-
-	if email == "" || pass == "" || clientUrl == "" {
-		panic("failed to get env variables")
-	}	
+	apiKey, _ := config.Get("RESEND_API_KEY")
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -612,17 +578,18 @@ func (ems *EmailSvc) SendUnrestrictedUserEmail(userName, userEmail string) {
 		</html>
 	`, userName, userEmail)
 
-	m := gomail.NewMessage()
-	m.SetHeader("From", m.FormatAddress(email, "Habeeb from Clivo"))
-	m.SetHeader("To", userEmail)
-	m.SetHeader("Subject", "Your Account Restriction Has Been Lifted")
-	m.SetBody("text/html", html)
+	client := resend.NewClient(apiKey)
 
-	d := gomail.NewDialer("smtp.gmail.com", 465, email, pass)
-	d.SSL = true
+	params := &resend.SendEmailRequest{
+		From: "Habeeb from Clivo <hello@myclivo.com>",
+		To: []string{userEmail},
+		Subject: "Your Account Restriction Has Been Lifted",
+		Html: html,
+	}
 
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("...User Un-Restriction Email Sent...")

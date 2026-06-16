@@ -77,7 +77,6 @@ func (ur *UserRepo) UpdateUserProfile(userId string, profileReq models.ProfileUp
 				Where("user_id = ?", userId).
 				Updates(map[string]interface{}{
 					"Name": profileReq.Name,
-					"Email": profileReq.Email,
 				})
 
 	if res.Error != nil {
@@ -103,7 +102,6 @@ func (ur *UserRepo) UpdateUserProfileWithPicture(userId string, profileReq model
 				Where("user_id = ?", userId).
 				Updates(map[string]interface{}{
 					"Name": profileReq.Name,
-					"Email": profileReq.Email,
 				})
 
 	if res.Error != nil {

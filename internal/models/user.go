@@ -46,7 +46,6 @@ type UserRequest struct {
 
 type ProfileUpdateRequest struct {
 	Name    string
-	Email    string
 	Website  string
 	Bio      string
 	Picture  *multipart.File

@@ -127,12 +127,11 @@ func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
 
 	//receive form data
 	name := c.PostForm("name")
-	email := c.PostForm("email")
 	website := c.PostForm("website")
 	bio := c.PostForm("bio")
 	picture, _, err := c.Request.FormFile("picture")
 
-	if name == "" || email == "" || website == "" || bio == "" {
+	if name == "" || website == "" || bio == "" {
 		utils.Error(c, 400, "No fields must be empty", nil)
 		return
 	}
@@ -140,7 +139,6 @@ func (uhdl *UserHandler) UpdateProfile(c *gin.Context) {
 	//build request
 	profileUpdateReq := models.ProfileUpdateRequest{
 		Name: name,
-		Email: email,
 		Website: website,
 		Bio: bio,
 		Picture: &picture,
