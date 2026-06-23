@@ -36,66 +36,95 @@ func (ems *EmailSvc) SendAdminMail(name, email string) error {
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
-				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-					<!-- logo -->
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>We miss your voice on Clivo</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
 					<tr>
-						<td style="padding: 20px; display: flex; justify-content: start; align-items: center; gap: 5px;">
-							<img src="%s" style="height: 40px">
-							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="%s" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 
+					<!-- Main Body -->
 					<tr>
-						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Hi %s,</p>
-
-							<p>
-                You signed up for Clivo a few days ago - and i noticed you haven't published anything yet.
-              </p>
-
-              <p>
-                That's totally normal. The blank page is the hardest part.
-              </p>
-
-              <p>
-                So here's a low-pressure challenge: write anything. It dosen't have to be perfect. A short opinion, a how-to, a story from your week - just hit publish.
-              </p>
-
-              <p>
-                Your first article is the hardest one. After that, it gets easier.
-              </p>
-
-              <p>
-                &#x1F449; Start writing on Clivo.
-              </p>
-
-              <p>
-                If you're stuck or have any questions, just reply to this email - I read every message.
-              </p>
-
-              <p>Cheers.</p>
-
-							<div style="line-height: 0.4; margin-top: 30px;">
-								<p>Habeeb Amoo</p>
-								<p>Creator, Clivo.</p>
-							</div>
-
-							<p style="margin: 50px 0;">
-								<a href="%s" style="background-color: rgb(20,20,20); color: #ffffff; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: bold;">Create Article</a>
+						<td style="padding: 20px 30px 40px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Hi %s,</p>
+							
+							<p style="font-size: 18px; color: #5d6ebd; font-weight: bold; margin-bottom: 16px;">
+								It’s been a while... ✍️
 							</p>
+
+							<p style="margin-bottom: 16px;">
+								It has been quite some time since you last shared your thoughts on Clivo, and the platform hasn't been the same without your voice. 
+							</p>
+
+							<p style="margin-bottom: 16px;">
+								Whether you've been busy, facing a bit of writer's block, or just taking a step back—we completely get it. Life moves fast, and staring down a blank page can feel daunting.
+							</p>
+
+							<p style="margin-bottom: 24px;">
+								But your perspective matters, and our readers love discovering fresh insights. Why not jump back in with something simple today? A quick update, a lesson you learned this month, or a short opinion piece. No pressure, just raw ideas.
+							</p>
+
+							<!-- Centered Call to Action Button Table -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
+								<tr>
+									<td align="center">
+										<table cellspacing="0" cellpadding="0">
+											<tr>
+												<td align="center" style="background-color: #141414; border-radius: 6px;">
+													<a href="%s" target="_blank" style="font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; padding: 12px 32px; display: inline-block; letter-spacing: 0.3px;">
+														Write Your Next Article
+													</a>
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+
+							<p style="margin-bottom: 30px;">
+								If there’s anything keeping you stuck or if you have ideas on how we can make Clivo better for your writing journey, just reply directly to this email. I read and answer every message.
+							</p>
+
+							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+								<p style="margin: 0;">Cheers,</p>
+								<p style="margin: 0; font-weight: bold; color: #111111;">Habeeb Amoo</p>
+								<p style="margin: 0; font-size: 13px; color: #888888;">Creator, Clivo</p>
+							</div>
 						</td>
 					</tr>
 
+					<!-- Footer -->
 					<tr>
-						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
-
-							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="%s" style="height: 15px">
-								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
-							</div>
-
+						<td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="%s" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 				</table>
@@ -277,52 +306,81 @@ func (ems *EmailSvc) SendVerifiedUserEmail(userName, userEmail string) {
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
-				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-					<!-- logo -->
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Your Account is Verified!</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
 					<tr>
-						<td style="padding: 20px;">
-							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
-							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 
+					<!-- Main Body -->
 					<tr>
-						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Hi %s,</p>
-							<p>Great news! Your account has been officially verified, and you’ll now see a blue check mark next to your name on your profile and published articles.</p>
+						<td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Hi %s,</p>
+							
+							<p style="font-size: 18px; color: #111111; font-weight: bold; margin-bottom: 16px;">
+								Great news! Your account has been officially verified. 🎉
+							</p>
 
-							<p>
-                This verification lets readers know that your identity has been confirmed and that your work comes from an authentic, trusted voice on our platform. It also helps your articles stand out and builds credibility with your audience.
-              </p>
+							<p style="margin-bottom: 20px;">
+								You’ll now see a blue check mark next to your name on your profile and published articles. This verification lets readers know that your identity has been confirmed and that your work comes from an authentic, trusted voice on our platform. It also helps your articles stand out and builds credibility with your audience.
+							</p>
 
-              <p>
-                There’s nothing you need to do — your verification is already live. Just keep writing, publishing, and engaging with the community as you always do.
-              </p>
+							<!-- Highlight Info Block -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #f9f9fb; border-left: 4px solid #5d6ebd; border-radius: 4px; margin-bottom: 24px;">
+								<tr>
+									<td style="padding: 16px 20px; color: #4a4a4a; font-size: 15px; line-height: 1.5;">
+										There’s nothing you need to do — your verification is already live. Just keep writing, publishing, and engaging with the community as you always do.
+									</td>
+								</tr>
+							</table>
 
-              <p>
-                Thanks for being a valued part of our writer community. We’re excited to see what you publish next.
-              </p>
+							<p style="margin-bottom: 30px;">
+								Thanks for being a valued part of our writer community. We’re excited to see what you publish next.
+							</p>
 
-							<div style="line-height: 0.4; margin-top: 30px;">
-								<p>Warm regards</p>
-								<p>The Clivo Team.</p>
+							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+								<p style="margin: 0;">Warm regards,</p>
+								<p style="margin: 0; font-weight: bold; color: #111111;">The Clivo Team</p>
 							</div>
 						</td>
 					</tr>
 
+					<!-- Footer -->
 					<tr>
-						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+						<td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0" style="margin-bottom: 12px;">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 
-							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
-								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
-							</div>
-
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
-								This message was sent to 
-								<span style="text-decoration: underline;">%s</span>
+							<p style="font-family: Arial, sans-serif; margin: 0; color: #888888; font-size: 12px;">
+								This message was sent to <span style="text-decoration: underline; color: #666666;">%s</span>
 							</p>
 						</td>
 					</tr>
@@ -342,7 +400,7 @@ func (ems *EmailSvc) SendVerifiedUserEmail(userName, userEmail string) {
 
 	_, err := client.Emails.Send(params)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	log.Println("...User Verified Email Sent...")
@@ -354,55 +412,81 @@ func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
-				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-					<!-- logo -->
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Account Status Update</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
 					<tr>
-						<td style="padding: 20px;">
-							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
-							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 
+					<!-- Main Body -->
 					<tr>
-						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Hi %s,</p>
-
-							<p>
-								We’re writing to let you know that the verification badge (blue check mark) has been removed from your account.
+						<td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Hi %s,</p>
+							
+							<p style="font-size: 18px; color: #111111; font-weight: bold; margin-bottom: 16px;">
+								Important update regarding your account status
 							</p>
 
-							<p>
-                This change doesn’t affect your ability to write, publish, or engage on the platform. Your profile and articles remain active and visible to readers as usual. Verification statuses may be updated from time to time based on our review processes and current eligibility criteria.
-              </p>
+							<p style="margin-bottom: 20px;">
+								We’re writing to let you know that the verification badge (blue check mark) has been removed from your account. Verification statuses may be updated from time to time based on our review processes and current eligibility criteria.
+							</p>
 
-              <p>
-                If you believe this change was made in error or if you’d like to learn more about verification requirements, you can review our guidelines or reach out to our support team for assistance.
-              </p>
+							<!-- Status Info Block -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #f9f9fb; border-left: 4px solid #64748b; border-radius: 4px; margin-bottom: 24px;">
+								<tr>
+									<td style="padding: 16px 20px; color: #4a4a4a; font-size: 15px; line-height: 1.5;">
+										<strong>Please note:</strong> This change does not affect your ability to write, publish, or engage on the platform. Your profile and articles remain fully active and visible to readers as usual.
+									</td>
+								</tr>
+							</table>
 
-              <p>
-                Thank you for being part of our writer community, and we appreciate your continued contributions.
-              </p>
+							<p style="margin-bottom: 30px;">
+								If you believe this change was made in error or if you’d like to learn more about verification requirements, you can review our guidelines or reply directly to this email to reach our support team for assistance.
+							</p>
 
-							<div style="line-height: 0.4; margin-top: 30px;">
-								<p>Warm regards</p>
-								<p>The Clivo Team.</p>
+							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+								<p style="margin: 0;">Warm regards,</p>
+								<p style="margin: 0; font-weight: bold; color: #111111;">The Clivo Team</p>
 							</div>
 						</td>
 					</tr>
 
+					<!-- Footer -->
 					<tr>
-						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+						<td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0" style="margin-bottom: 12px;">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 
-							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
-								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
-							</div>
-
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
-								This message was sent to 
-								<span style="text-decoration: underline;">%s</span>
+							<p style="font-family: Arial, sans-serif; margin: 0; color: #888888; font-size: 12px;">
+								This message was sent to <span style="text-decoration: underline; color: #666666;">%s</span>
 							</p>
 						</td>
 					</tr>
@@ -422,7 +506,7 @@ func (ems *EmailSvc) SendUnverifiedUserEmail(userName, userEmail string) {
 
 	_, err := client.Emails.Send(params)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	log.Println("...User Un-Verified Email Sent...")
@@ -434,65 +518,86 @@ func (ems *EmailSvc) SendRestrictedUserEmail(userName, userEmail string) {
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
-				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-					<!-- logo -->
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Account Restriction Notice</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
 					<tr>
-						<td style="padding: 20px;">
-							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
-							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 
+					<!-- Main Body -->
 					<tr>
-						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Dear %s,</p>
-
-							<p>
-								We’re writing to inform you that your account has been temporarily restricted due to content that violates our Community Guidelines.
+						<td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Dear %s,</p>
+							
+							<p style="font-size: 18px; color: #dc2626; font-weight: bold; margin-bottom: 16px;">
+								Your account has been temporarily restricted ⚠️
 							</p>
 
-							<p>
-								Specifically, we identified one or more published articles that contain material inconsistent with our policies regarding [e.g., harassment, misinformation, hate speech, spam, copyright infringement]. As a result, your publishing privileges have been temporarily suspended.
+							<p style="margin-bottom: 20px;">
+								We’re writing to inform you that your account has been temporarily restricted due to content that violates our Community Guidelines. Specifically, we identified one or more published articles that contain material inconsistent with our platform policies. As a result, your privileges have been temporarily suspended.
 							</p>
 
-							<p>
-								During this restriction period:
+							<!-- Restriction Details Callout Block -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #fef2f2; border-left: 4px solid #dc2626; border-radius: 4px; margin-bottom: 24px;">
+								<tr>
+									<td style="padding: 16px 20px; color: #991b1b; font-size: 15px; line-height: 1.6;">
+										<strong style="display: block; margin-bottom: 6px;">During this restriction period:</strong>
+										<ul style="margin: 0; padding-left: 20px; color: #7f1d1d;">
+											<li style="margin-bottom: 4px;">You won't be able to log in.</li>
+											<li style="margin-bottom: 4px;">You will not be able to publish new articles.</li>
+											<li>Existing content may be under review or permanently deleted.</li>
+										</ul>
+									</td>
+								</tr>
+							</table>
+
+							<p style="margin-bottom: 30px;">
+								If you believe this action was taken in error, you may submit an appeal within 7 days by replying directly to this email or contacting our team at <a href="mailto:clivoinc@gmail.com" style="color: #5d6ebd; text-decoration: underline;">clivoinc@gmail.com</a>.
 							</p>
 
-							<ul>
-								<li>You won't be able to login</li>
-								<li>You will not be able to publish new articles.</li>
-								<li>Existing content may be under review or permanently deleted.</li>
-							</ul>
-
-							<p>
-								If you believe this action was taken in error, you may submit an appeal within 7 days by contacting our team at [clivoinc@gmail.com].
-							</p>
-
-							<p>
-								We value thoughtful and responsible contributions to our platform and hope you will continue to share your voice in accordance with our policies.
-							</p>
-
-							<div style="line-height: 0.4; margin-top: 30px;">
-								<p>Warm regards</p>
-								<p>The Clivo Team.</p>
+							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+								<p style="margin: 0;">Warm regards,</p>
+								<p style="margin: 0; font-weight: bold; color: #111111;">The Clivo Team</p>
 							</div>
 						</td>
 					</tr>
 
+					<!-- Footer -->
 					<tr>
-						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+						<td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0" style="margin-bottom: 12px;">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 
-							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
-								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
-							</div>
-
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
-								This message was sent to 
-								<span style="text-decoration: underline;">%s</span>
+							<p style="font-family: Arial, sans-serif; margin: 0; color: #888888; font-size: 12px;">
+								This message was sent to <span style="text-decoration: underline; color: #666666;">%s</span>
 							</p>
 						</td>
 					</tr>
@@ -524,55 +629,81 @@ func (ems *EmailSvc) SendUnrestrictedUserEmail(userName, userEmail string) {
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
 		<html lang="en">
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0;">
-				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-					<!-- logo -->
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Account Access Restored</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
 					<tr>
-						<td style="padding: 20px;">
-							<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 40px">
-							<h1 style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Clivo</h1>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 
+					<!-- Main Body -->
 					<tr>
-						<td style="padding: 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-							<p>Dear %s,</p>
-
-							<p>
-								We’re pleased to inform you that the restriction previously placed on your account has been lifted.
+						<td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Dear %s,</p>
+							
+							<p style="font-size: 18px; color: #5d6ebd; font-weight: bold; margin-bottom: 16px;">
+								Your account restriction has been lifted 🎉
 							</p>
 
-							<p>
-								After reviewing your account, we have restored full access to your profile and publishing privileges. You may now continue creating and engaging on the platform as usual.
+							<p style="margin-bottom: 20px;">
+								We’re pleased to inform you that the restriction previously placed on your account has been lifted. After reviewing your account, we have restored full access to your profile and publishing privileges. You may now continue creating and engaging on the platform as usual.
 							</p>
 
-							<p>
-								We appreciate your patience during the review process and your commitment to maintaining the standards of our community. If you have any questions or need clarification regarding our guidelines, please feel free to reach out to our support team.
+							<!-- Success Information Callout Block -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #f0f2fe; border-left: 4px solid #5d6ebd; border-radius: 4px; margin-bottom: 24px;">
+								<tr>
+									<td style="padding: 16px 20px; color: #2e3a8c; font-size: 15px; line-height: 1.5;">
+										We appreciate your patience during the review process and your commitment to maintaining the standards of our community. 
+									</td>
+								</tr>
+							</table>
+
+							<p style="margin-bottom: 30px;">
+								If you have any questions or need clarification regarding our community guidelines, please feel free to reach out to our support team. Thank you for being a valued member of our community.
 							</p>
 
-							<p>
-								Thank you for being a valued member of our community.
-							</p>
-
-							<div style="line-height: 0.4; margin-top: 30px;">
-								<p>Warm regards</p>
-								<p>The Clivo Team.</p>
+							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+								<p style="margin: 0;">Warm regards,</p>
+								<p style="margin: 0; font-weight: bold; color: #111111;">The Clivo Team</p>
 							</div>
 						</td>
 					</tr>
 
+					<!-- Footer -->
 					<tr>
-						<td style="background-color: #f1f1f1; padding: 15px; text-align: center; font-size: 14px; color: #888888; line-height: 0;">
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">from</p>
+						<td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0" style="margin-bottom: 12px;">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
 
-							<div style="display: flex; align-items: center; gap: 3px; justify-content: center;">
-								<img src="https://res.cloudinary.com/djvuchlcr/image/upload/c_fill,h_150,w_150/v1/profile_pics/fukp4ijlrcz9ojzrmy25?_a=AQAV6nF" style="height: 15px">
-								<p style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: black; font-weight: bold;">Clivo</p>  
-							</div>
-
-							<p style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif">
-								This message was sent to 
-								<span style="text-decoration: underline;">%s</span>
+							<p style="font-family: Arial, sans-serif; margin: 0; color: #888888; font-size: 12px;">
+								This message was sent to <span style="text-decoration: underline; color: #666666;">%s</span>
 							</p>
 						</td>
 					</tr>

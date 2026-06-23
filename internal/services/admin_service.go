@@ -107,6 +107,7 @@ func (as *AdminSvc) VerifyUser(userId string) (int, error) {
 			}
 		}()
 
+		log.Println("sending mail...")
 		NewEmailService().SendVerifiedUserEmail(user.Name, user.Email)
 	}()
 
@@ -140,6 +141,7 @@ func (as *AdminSvc) UnVerifyUser(userId string) (int, error) {
 			}
 		}()
 
+		log.Println("sending mail...")
 		NewEmailService().SendUnverifiedUserEmail(user.Name, user.Email)
 	}()
 
