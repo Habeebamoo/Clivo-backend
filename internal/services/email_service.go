@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/Habeebamoo/Clivo/server/internal/config"
+	"github.com/Habeebamoo/Clivo/server/internal/models"
 	"github.com/resend/resend-go/v3"
 )
 
@@ -16,6 +17,8 @@ type EmailService interface {
 	SendUnverifiedUserEmail(string, string)
 	SendRestrictedUserEmail(string, string)
 	SendUnrestrictedUserEmail(string, string)
+	SendCommentNotificationEmail(models.UserResponse, models.UserResponse, models.Article, models.Comment)
+	SendCommentReplyNotificationEmail(models.UserResponse, models.UserResponse, models.Article, models.Comment)
 }
 
 type EmailSvc struct {}
@@ -594,3 +597,224 @@ func (ems *EmailSvc) SendUnrestrictedUserEmail(userName, userEmail string) {
 
 	log.Println("...User Un-Restriction Email Sent...")
 }
+
+func (ems *EmailSvc) SendCommentNotificationEmail(author, commenter models.UserResponse, article models.Article, comment models.Comment) {
+	apiKey, _ := config.Get("RESEND_API_KEY")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	logoUrl := fmt.Sprintf("%s/logo.png", clientUrl)
+	postUrl := fmt.Sprintf("%s/%s", clientUrl, article.Slug)
+	subject := fmt.Sprintf("%s commented on your post", commenter.Name)
+
+	html := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>New Comment on Your Post</title>
+			</head>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+				<table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+					
+					<!-- Header / Logo -->
+					<tr>
+						<td style="padding: 24px 30px 10px 30px;">
+							<table width="100%%" cellspacing="0" cellpadding="0">
+								<tr>
+									<td width="40" style="vertical-align: middle;">
+										<img src="%s" alt="Clivo Logo" style="height: 35px; display: block;">
+									</td>
+									<td style="padding-left: 8px; vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+					<!-- Main Body -->
+					<tr>
+						<td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+							<p style="margin-top: 0;">Hi %s,</p>
+
+							<p style="margin-bottom: 24px;">
+								<strong>%s</strong> just left a comment on your post, <span style="color: #111111; font-weight: 600;">"%s"</span>:
+							</p>
+
+							<!-- Comment Box Preview -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #f9f9fb; border-left: 4px solid #5d6ebd; border-radius: 4px; margin-bottom: 28px;">
+								<tr>
+									<td style="padding: 16px 20px; font-style: italic; color: #4a4a4a; font-size: 15px; line-height: 1.5;">
+										"%s"
+									</td>
+								</tr>
+							</table>
+
+							<!-- Call to Action Button -->
+							<table width="100%%" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
+								<tr>
+									<td align="left">
+										<a href="%s" target="_blank" style="background-color: #5d6ebd; color: #ffffff; padding: 12px 24px; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 15px; display: inline-block;">
+											Reply to Comment
+										</a>
+									</td>
+								</tr>
+							</table>
+
+							<p style="font-size: 14px; color: #666666; margin-bottom: 0;">
+								If the button doesn't work, copy and paste this link into your browser:<br>
+								<a href="%s" style="color: #5d6ebd; word-break: break-all; font-size: 13px;">%s</a>
+							</p>
+						</td>
+					</tr>
+
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee;">
+							<p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+							
+							<table align="center" cellspacing="0" cellpadding="0">
+								<tr>
+									<td style="vertical-align: middle; padding-right: 4px;">
+										<img src="%s" alt="Clivo" style="height: 14px; display: block;">
+									</td>
+									<td style="vertical-align: middle;">
+										<span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	`, logoUrl, author.Name, commenter.Name, article.Title, comment.Content, postUrl, postUrl, postUrl, logoUrl)
+
+	client := resend.NewClient(apiKey)
+
+	params := &resend.SendEmailRequest{
+		From: "Clivo <hello@myclivo.com>",
+		To: []string{author.Email},
+		Subject: subject,
+		Html: html,
+	}
+
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Println(err)
+	}
+	
+	log.Println("Email Request Received")
+}
+
+func (ems *EmailSvc) SendCommentReplyNotificationEmail(commenter, replier models.UserResponse, article models.Article, reply models.Comment) {
+	apiKey, _ := config.Get("RESEND_API_KEY")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	logoUrl := fmt.Sprintf("%s/logo.png", clientUrl)
+	postUrl := fmt.Sprintf("%s/%s", clientUrl, article.Slug)
+	subject := fmt.Sprintf("%s replied to your comment", replier.Name)
+
+	html := fmt.Sprintf(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Reply to Your Comment</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+        <table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+          
+          <!-- Header / Logo -->
+          <tr>
+            <td style="padding: 24px 30px 10px 30px;">
+              <table width="100%%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="40" style="vertical-align: middle;">
+                    <img src="%s" alt="Clivo Logo" style="height: 35px; display: block;">
+                  </td>
+                  <td style="padding-left: 8px; vertical-align: middle;">
+                    <span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 20px 30px 30px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+              <p style="margin-top: 0;">Hi %s,</p>
+
+              <p style="margin-bottom: 24px;">
+                <strong>%s</strong> just replied to your comment on the post, <span style="color: #111111; font-weight: 600;">"%s"</span>:
+              </p>
+
+              <!-- Reply Box Preview -->
+              <table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #f9f9fb; border-left: 4px solid #5d6ebd; border-radius: 4px; margin-bottom: 28px;">
+                <tr>
+                  <td style="padding: 16px 20px; font-style: italic; color: #4a4a4a; font-size: 15px; line-height: 1.5;">
+                    "%s"
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Call to Action Button -->
+              <table width="100%%" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
+                <tr>
+                  <td align="left">
+                    <a href="%s" target="_blank" style="background-color: #5d6ebd; color: #ffffff; padding: 12px 24px; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 15px; display: inline-block;">
+                      View Reply
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 14px; color: #666666; margin-bottom: 0;">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <a href="%s" style="color: #5d6ebd; word-break: break-all; font-size: 13px;">%s</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee;">
+              <p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+              
+              <table align="center" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 4px;">
+                    <img src="%s" alt="Clivo" style="height: 14px; display: block;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `, logoUrl, commenter.Name, replier.Name, article.Title, reply.Content, postUrl, postUrl, postUrl, logoUrl)
+
+	client := resend.NewClient(apiKey)
+
+	params := &resend.SendEmailRequest{
+		From:    "Clivo <hello@myclivo.com>",
+		To:      []string{commenter.Email},
+		Subject: subject,
+		Html:    html,
+	}
+
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println("Reply Email Request Received")
+}
+

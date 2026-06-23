@@ -10,6 +10,25 @@ import (
 
 // Create comment
 func (as *ArticleSvc) CommentArticle(commentReq models.CommentRequest) (int, error) {
+	//get article
+	article, code, err := as.articleRepo.GetArticleById(commentReq.ArticleId)
+	if err != nil {
+		return code, err
+	}
+	
+	//get article author
+	author, code, err := as.authRepo.GetUserById(article.AuthorId)
+	if err != nil {
+		return code, err
+	}
+
+	//get user that commented
+	commenter, code, err := as.authRepo.GetUserById(commentReq.UserId)
+	if err != nil {
+		return code, err
+	}
+
+	//create comment
 	comment := models.Comment{
 		CommentId: utils.GenerateRandomId(),
 		ArticleId: commentReq.ArticleId,
@@ -19,11 +38,38 @@ func (as *ArticleSvc) CommentArticle(commentReq models.CommentRequest) (int, err
 		Content: commentReq.Content,
 	}
 
+	//send the author a comment notification
+	go NewEmailService().SendCommentNotificationEmail(author, commenter, article, comment)
+
 	return as.articleRepo.CreateComment(comment)
 }
 
 // Create reply - comment
 func (as *ArticleSvc) ReplyComment(replyReq models.ReplyRequest) (int, error) {
+	//get article
+	article, code, err := as.articleRepo.GetArticleById(replyReq.ArticleId)
+	if err != nil {
+		return code, err
+	}
+	
+	//get repllier
+	replier, code, err := as.authRepo.GetUserById(replyReq.UserId)
+	if err != nil {
+		return code, err
+	}
+
+	//get user that commented
+	parentComment, code, err := as.articleRepo.GetComment(replyReq.CommentId)
+	if err != nil {
+		return code, err
+	}
+
+	commenter, code, err := as.authRepo.GetUserById(parentComment.UserId)
+	if err != nil {
+		return code, err
+	}
+
+	//create comment
 	comment := models.Comment{
 		CommentId: utils.GenerateRandomId(),
 		ArticleId: "",
@@ -34,10 +80,13 @@ func (as *ArticleSvc) ReplyComment(replyReq models.ReplyRequest) (int, error) {
 	}
 
 	//create reply(comment)
-	code, err := as.articleRepo.CreateComment(comment)
+	code, err = as.articleRepo.CreateComment(comment)
 	if err != nil {
 		return code, err
 	}
+
+	//send the commenter a reply notification
+	go NewEmailService().SendCommentReplyNotificationEmail(commenter, replier, article, comment)
 
 	//update replys
 	return as.articleRepo.UpdateReplys(comment.ReplyId)

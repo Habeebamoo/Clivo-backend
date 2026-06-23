@@ -23,6 +23,7 @@ type ArticleRepository interface {
 	CreateLike(models.Like) (int, error)
 	RemoveLike(models.Like) (int, error)
 	CreateComment(models.Comment) (int, error)
+	GetComment(string) (models.Comment, int, error)
 	UpdateReplys(string) (int, error)
 	GetArticleLikes(string) (int, error)
 }
@@ -236,6 +237,17 @@ func (ar *ArticleRepo) CreateComment(commentReq models.Comment) (int, error) {
 	}
 
 	return 201, nil
+}
+
+func (ar *ArticleRepo) GetComment(commentId string) (models.Comment, int, error) {
+	comment := models.Comment{}
+
+	res := ar.db.Find(&comment, "comment_id = ?", commentId)
+	if res.Error != nil {
+		return comment, 500, fmt.Errorf("failed to get comment")
+	}
+
+	return comment, 201, nil
 }
 
 func (ar *ArticleRepo) UpdateReplys(commentId string) (int, error) {
