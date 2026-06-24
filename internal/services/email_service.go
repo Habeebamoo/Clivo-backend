@@ -10,7 +10,7 @@ import (
 )
 
 type EmailService interface {
-	SendWeeklyDigestAnnouncementMail(string, string)
+	SendWeeklyDigestAnnouncementMail(string)
 	SendAdminMail(string, string) error
 	SendWelcomeEmail(string, string, string)
 	SendWelcomeEmailToAdmin(string, string, string, string)
@@ -28,14 +28,14 @@ func NewEmailService() EmailService {
 	return &EmailSvc{}
 }
 
-func (ems *EmailSvc) SendWeeklyDigestAnnouncementMail(name, email string) {
+func (ems *EmailSvc) SendWeeklyDigestAnnouncementMail(email string) {
 	apiKey, _ := config.Get("RESEND_API_KEY")
 	clientUrl, _ := config.Get("CLIENT_URL")
 
 	imgUrl := fmt.Sprintf("%s/logo.png", clientUrl)
 	authorAvatarUrl := fmt.Sprintf("%s/avatar.png", clientUrl) 
 	
-	subject := fmt.Sprintf("🚀 Coming Soon: Your Weekly Clivo Digest, %s", name)
+	subject := "🚀 Coming Soon: Your Weekly Clivo Digest"
 
 	html := fmt.Sprintf(`
     <!DOCTYPE html>
@@ -67,7 +67,7 @@ func (ems *EmailSvc) SendWeeklyDigestAnnouncementMail(name, email string) {
           <!-- Main Body -->
           <tr>
             <td style="padding: 20px 30px 40px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
-              <p style="margin-top: 0;">Hi %s,</p>
+              <p style="margin-top: 0;">Hi there,</p>
               
               <p style="font-size: 18px; color: #5d6ebd; font-weight: bold; margin-bottom: 16px;">
                 Great stories are heading your way... 📨
@@ -165,7 +165,7 @@ func (ems *EmailSvc) SendWeeklyDigestAnnouncementMail(name, email string) {
         </table>
       </body>
     </html>
-  `, imgUrl, name, clientUrl, authorAvatarUrl, clientUrl, imgUrl)
+  `, imgUrl, clientUrl, authorAvatarUrl, clientUrl, imgUrl)
 
 	client := resend.NewClient(apiKey)
 

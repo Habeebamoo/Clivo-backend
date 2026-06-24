@@ -247,8 +247,16 @@ func (as *AdminSvc) SendMail() (int, error) {
 		return code, err
 	}
 
-	for _, user := range users {
-		NewEmailService().SendWeeklyDigestAnnouncementMail(user.Name, user.Email)
+	//get all subscribers
+	subscribers, code, err := as.repo.GetSubscribers()
+	if err != nil {
+		return code, err
+	}
+
+	userEmails := utils.ExtractEmails(users, subscribers)
+
+	for _, email := range userEmails {
+		NewEmailService().SendWeeklyDigestAnnouncementMail(email)
 		time.Sleep(5*time.Second)
 	}
 

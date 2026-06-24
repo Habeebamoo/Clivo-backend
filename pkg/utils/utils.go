@@ -12,6 +12,7 @@ import (
 	mrand "math/rand"
 	"mime/multipart"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -24,6 +25,44 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
+
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+func ExtractEmails[T1 any, T2 any](model1 T1, model2 T2) []string {
+	emailsMap := make(map[string]bool)
+
+	var scanValue func(reflect.Value)
+	scanValue = func(v reflect.Value) {
+		if v.Kind() == reflect.Ptr {
+			if v.IsNil() {
+				return
+			}
+			v = v.Elem()
+		}
+
+		switch v.Kind() {
+		case reflect.Struct:
+			for i := 0; i < v.NumField(); i++ {
+				scanValue(v.Field(i))
+			}
+		case reflect.String:
+			str := strings.TrimSpace(v.String())
+			if emailRegex.MatchString(str) {
+				emailsMap[strings.ToLower(str)] = true
+			}
+		}
+	}
+
+	scanValue(reflect.ValueOf(model1))
+	scanValue(reflect.ValueOf(model2))
+
+	var uniqueEmails []string
+	for email := range emailsMap {
+		uniqueEmails = append(uniqueEmails, email)
+	}
+
+	return uniqueEmails
+}
 
 func Slugify(title string) string {
 	slug := strings.ToLower(title)

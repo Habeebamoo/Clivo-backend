@@ -9,6 +9,7 @@ import (
 
 type AdminRepository interface {
 	GetUsers() ([]models.UserResponse, int, error)
+	GetSubscribers() ([]models.Subscriber, int, error)
 	GetAppeals() ([]models.Appeal, int, error)
 	GetUser(string) (models.UserResponse, int, error)
 	UpdateUserVerification(string, bool) (int, error)
@@ -42,6 +43,20 @@ func (ar *AdminRepo) GetUsers() ([]models.UserResponse, int, error) {
 	}
 
 	return users, 200, nil
+}
+
+func (ar *AdminRepo) GetSubscribers() ([]models.Subscriber, int, error) {
+	var subscribers []models.Subscriber
+	res := ar.db.Find(&subscribers)
+
+	if res.Error != nil {
+		if res.Error == gorm.ErrRecordNotFound {
+			return subscribers, 200, nil
+		}
+		return subscribers, 500, fmt.Errorf("internal server error")
+	}
+
+	return subscribers, 200, nil
 }
 
 func (ar *AdminRepo) GetAppeals() ([]models.Appeal, int, error) {
