@@ -242,15 +242,15 @@ func (as *AdminSvc) DeleteUserArticle(articleId string) (int, error) {
 
 func (as *AdminSvc) SendMail() (int, error) {
 	//get all users
-	users, code, err := as.repo.GetUsers()
-	if err != nil {
-		return code, err
-	}
+	// users, code, err := as.repo.GetUsers()
+	// if err != nil {
+	// 	return code, err
+	// }
 
-	for _, user := range users {
-		NewEmailService().SendAdminMail(user.Name, user.Email)
+	// for _, user := range users {
+		NewEmailService().SendWeeklyDigestAnnouncementMail("Habeeb", "habeebamoo08@gmail.com")
 		time.Sleep(5*time.Second)
-	}
+	// }
 
 	return 200, nil
 }

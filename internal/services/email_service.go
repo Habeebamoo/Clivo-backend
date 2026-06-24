@@ -10,6 +10,7 @@ import (
 )
 
 type EmailService interface {
+	SendWeeklyDigestAnnouncementMail(string, string)
 	SendAdminMail(string, string) error
 	SendWelcomeEmail(string, string, string)
 	SendWelcomeEmailToAdmin(string, string, string, string)
@@ -25,6 +26,162 @@ type EmailSvc struct {}
 
 func NewEmailService() EmailService {
 	return &EmailSvc{}
+}
+
+func (ems *EmailSvc) SendWeeklyDigestAnnouncementMail(name, email string) {
+	apiKey, _ := config.Get("RESEND_API_KEY")
+	clientUrl, _ := config.Get("CLIENT_URL")
+
+	imgUrl := fmt.Sprintf("%s/logo.png", clientUrl)
+	authorAvatarUrl := fmt.Sprintf("%s/avatar.png", clientUrl) 
+	
+	subject := fmt.Sprintf("🚀 Coming Soon: Your Weekly Clivo Digest, %s", name)
+
+	html := fmt.Sprintf(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Weekly Article Digest is Coming Soon!</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f4f7; padding: 10px; margin: 0; -webkit-font-smoothing: antialiased;">
+        <table width="100%%" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+          
+          <!-- Header / Logo -->
+          <tr>
+            <td style="padding: 24px 30px 10px 30px;">
+              <table width="100%%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td width="40" style="vertical-align: middle;">
+                    <img src="%s" alt="Clivo Logo" style="height: 35px; display: block;">
+                  </td>
+                  <td style="padding-left: 8px; vertical-align: middle;">
+                    <span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: bold; color: #111111;">Clivo</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 20px 30px 40px 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+              <p style="margin-top: 0;">Hi %s,</p>
+              
+              <p style="font-size: 18px; color: #5d6ebd; font-weight: bold; margin-bottom: 16px;">
+                Great stories are heading your way... 📨
+              </p>
+
+              <p style="margin-bottom: 16px;">
+                We love seeing the incredible perspectives shared on Clivo every day. To make sure you never miss out on brilliant insights, trending discussions, and fresh ideas, we are launching the <strong>Clivo Weekly Article Digest</strong> very soon!
+              </p>
+
+              <p style="margin-bottom: 24px;">
+                Every week, we’ll curate a personalized selection of top stories directly to your inbox. Here is a sneak peek of how your digest will look:
+              </p>
+
+              <!-- EXAMPLE DIGEST CARD -->
+              <table width="100%%" cellspacing="0" cellpadding="0" style="background-color: #fafafa; border: 1px solid #eef0f5; border-radius: 8px; margin: 25px 0; overflow: hidden;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <!-- Badge -->
+                    <span style="background-color: #eef0f5; color: #5d6ebd; font-size: 11px; font-weight: bold; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; letter-spacing: 0.5px;">Trending This Week</span>
+                    
+                    <!-- Title -->
+                    <h3 style="margin: 12px 0 8px 0; font-size: 18px; color: #111111; line-height: 1.4;">
+                      <a href="%s" target="_blank" style="color: #111111; text-decoration: none;">How to Overcome the Blank Page: A Practical Guide for Modern Writers</a>
+                    </h3>
+                    
+                    <!-- Snippet -->
+                    <p style="margin: 0 0 16px 0; font-size: 14px; color: #666666; line-height: 1.5;">
+                      Staring at a flashing cursor is the hardest part of writing. In this piece, we break down three simple cognitive exercises to unlock your creativity and ship your draft...
+                    </p>
+                    
+                    <!-- Author & Meta info -->
+                    <table width="100%%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="32" style="vertical-align: middle;">
+                          <img src="%s" alt="Author" style="width: 32px; height: 32px; border-radius: 50%%; display: block; background-color: #ccc;">
+                        </td>
+                        <td style="padding-left: 10px; vertical-align: middle; font-size: 13px; color: #555555;">
+                          <strong>Habeeb Amoo</strong> <span style="color: #aaaaaa;">• 4 min read</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin-bottom: 24px;">
+                Want to see your own articles featured in the upcoming digests? Keep sharing your unique insights with the community. 
+              </p>
+
+              <!-- Centered Call to Action Button Table -->
+              <table width="100%%" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
+                <tr>
+                  <td align="center">
+                    <table cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center" style="background-color: #141414; border-radius: 6px;">
+                          <a href="%s" target="_blank" style="font-family: Arial, sans-serif; font-size: 15px; font-weight: bold; color: #ffffff; text-decoration: none; padding: 12px 32px; display: inline-block; letter-spacing: 0.3px;">
+                            Explore Clivo Today
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin-bottom: 30px;">
+                Stay tuned for the first official drop next week. If you have any feedback or features you'd like to see in the digest, feel free to reply directly to this email!
+              </p>
+
+              <div style="line-height: 1.5; margin-top: 30px; color: #555555;">
+                <p style="margin: 0;">Cheers,</p>
+                <p style="margin: 0; font-size: 13px; color: #888888;">Clivo Team</p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 24px 20px; text-align: center; font-size: 12px; color: #888888; border-top: 1px solid #eeeeee; line-height: 1.5;">
+              <p style="font-family: Cambria, Georgia, serif; font-style: italic; margin: 0 0 8px 0; font-size: 14px;">from</p>
+              
+              <table align="center" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 4px;">
+                    <img src="%s" alt="Clivo" style="height: 14px; display: block;">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; color: #111111; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">Clivo</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `, imgUrl, name, clientUrl, authorAvatarUrl, clientUrl, imgUrl)
+
+	client := resend.NewClient(apiKey)
+
+	params := &resend.SendEmailRequest{
+		From:    "Clivo <hello@myclivo.com>",
+		To:      []string{email},
+		Subject: subject,
+		Html:    html,
+	}
+
+	_, err := client.Emails.Send(params)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println("Weekly Digest Announcement Email Request Sent")
 }
 
 func (ems *EmailSvc) SendAdminMail(name, email string) error {
