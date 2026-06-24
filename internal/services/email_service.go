@@ -32,6 +32,7 @@ func (ems *EmailSvc) SendAdminMail(name, email string) error {
 	clientUrl, _ := config.Get("CLIENT_URL")
 
 	imgUrl := fmt.Sprintf("%s/logo.png", clientUrl)
+	subject := fmt.Sprintf("We miss your voice on Clivo, %s", name)
 
 	html := fmt.Sprintf(`
 		<!DOCTYPE html>
@@ -104,8 +105,7 @@ func (ems *EmailSvc) SendAdminMail(name, email string) error {
 
 							<div style="line-height: 1.5; margin-top: 30px; color: #555555;">
 								<p style="margin: 0;">Cheers,</p>
-								<p style="margin: 0; font-weight: bold; color: #111111;">Habeeb Amoo</p>
-								<p style="margin: 0; font-size: 13px; color: #888888;">Creator, Clivo</p>
+								<p style="margin: 0; font-size: 13px; color: #888888;">Clivo</p>
 							</div>
 						</td>
 					</tr>
@@ -137,7 +137,7 @@ func (ems *EmailSvc) SendAdminMail(name, email string) error {
 	params := &resend.SendEmailRequest{
 		From: "Habeeb from Clivo <hello@myclivo.com>",
 		To: []string{email},
-		Subject: "You joined Clivo - What's stopping you?",
+		Subject: subject,
 		Html: html,
 	}
 
