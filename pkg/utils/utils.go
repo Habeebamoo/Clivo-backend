@@ -29,39 +29,48 @@ import (
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 func ExtractEmails[T1 any, T2 any](model1 T1, model2 T2) []string {
-	emailsMap := make(map[string]bool)
+    emailsMap := make(map[string]bool)
 
-	var scanValue func(reflect.Value)
-	scanValue = func(v reflect.Value) {
-		if v.Kind() == reflect.Ptr {
-			if v.IsNil() {
-				return
-			}
-			v = v.Elem()
-		}
+    var scanValue func(reflect.Value)
+    scanValue = func(v reflect.Value) {
+        // unwrap pointer
+        for v.Kind() == reflect.Ptr || v.Kind() == reflect.Interface {
+            if v.IsNil() {
+                return
+            }
+            v = v.Elem()
+        }
 
-		switch v.Kind() {
-		case reflect.Struct:
-			for i := 0; i < v.NumField(); i++ {
-				scanValue(v.Field(i))
-			}
-		case reflect.String:
-			str := strings.TrimSpace(v.String())
-			if emailRegex.MatchString(str) {
-				emailsMap[strings.ToLower(str)] = true
-			}
-		}
-	}
+        switch v.Kind() {
+        case reflect.Struct:
+            for i := 0; i < v.NumField(); i++ {
+                scanValue(v.Field(i))
+            }
+        case reflect.Slice, reflect.Array:
+            for i := 0; i < v.Len(); i++ {
+                scanValue(v.Index(i))
+            }
+        case reflect.Map:
+            for _, key := range v.MapKeys() {
+                scanValue(v.MapIndex(key))
+            }
+        case reflect.String:
+            str := strings.TrimSpace(v.String())
+            if emailRegex.MatchString(str) {
+                emailsMap[strings.ToLower(str)] = true
+            }
+        }
+    }
 
-	scanValue(reflect.ValueOf(model1))
-	scanValue(reflect.ValueOf(model2))
+    scanValue(reflect.ValueOf(model1))
+    scanValue(reflect.ValueOf(model2))
 
-	var uniqueEmails []string
-	for email := range emailsMap {
-		uniqueEmails = append(uniqueEmails, email)
-	}
+    var uniqueEmails []string
+    for email := range emailsMap {
+        uniqueEmails = append(uniqueEmails, email)
+    }
 
-	return uniqueEmails
+    return uniqueEmails
 }
 
 func Slugify(title string) string {
