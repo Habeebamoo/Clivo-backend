@@ -64,6 +64,29 @@ func (ah *ArticleHandler) ReplyComment(c *gin.Context) {
 	utils.Success(c, statusCode, "Reply Sent.", nil)
 }
 
+func (ah *ArticleHandler) AgentComment(c *gin.Context) {
+	var replyRequest models.CommentRequest
+	if err := c.ShouldBindJSON(&replyRequest); err != nil {
+		utils.Error(c, 400, "Invalid JSON Format", nil)
+		return
+	}
+
+	//validate request
+	if err := replyRequest.Validate(); err != nil {
+		utils.Error(c, 400, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	//call service
+	statusCode, err := ah.service.CommentArticle(replyRequest)
+		if err != nil {
+		utils.Error(c, statusCode, utils.FormatText(err.Error()), nil)
+		return
+	}
+
+	utils.Success(c, statusCode, "Comment Sent.", nil)
+}
+
 func (uhdl *UserHandler) GetCommentReplys(c *gin.Context) {
 	commentId := c.Param("id")
 
