@@ -94,5 +94,11 @@ func SetupRoutes(
 		admin.POST("/sendmail", adminHandler.SendMail)
 	}
 
+	//agentic routes
+	agent := api.Group("/agent", middlewares.AuthenticateAgent())
+	{
+		agent.POST("/comment", articleHandler.AgentComment)
+	}
+
 	return r
 }
