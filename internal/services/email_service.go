@@ -386,7 +386,6 @@ func (ems *EmailSvc) SendWelcomeEmail(userName, userEmail, userUsername string) 
 //welcome email to admin
 func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, interests string) {
 	apiKey, _ := config.Get("RESEND_API_KEY")
-	email, _ := config.Get("ADMIN_EMAIL")
 	clientUrl, _ := config.Get("CLIENT_URL")
 
 	html := fmt.Sprintf(`
@@ -444,7 +443,7 @@ func (ems *EmailSvc) SendWelcomeEmailToAdmin(userName, userEmail, userUsername, 
 
 	params := &resend.SendEmailRequest{
 		From: "Clivo <hello@myclivo.com>",
-		To: []string{email},
+		To: []string{"habeebamoo08@gmail.com"},
 		Subject: "New User on Clivo",
 		Html: html,
 	}
