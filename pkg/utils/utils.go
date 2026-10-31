@@ -109,7 +109,7 @@ func SetCookies(c *gin.Context, token string) {
 		MaxAge: 3600,
 		Secure: true, //true for production
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
@@ -122,7 +122,7 @@ func RemoveCookies(c *gin.Context) {
 		MaxAge: -1,
 		Secure: true, // true for production
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
